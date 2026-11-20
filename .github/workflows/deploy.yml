@@ -1,0 +1,41 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://notebook.tiniglabs.digital
+    env:
+      CLOUDFLARE_ACCOUNT_ID: 2fcc1a11a17dd9d16e76f4fa7ea2ee58
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - name: Generate types
+        run: npm run cf-typegen && npx next typegen
+      - run: npm run typecheck
+      - run: npm test
+      - name: Build
+        run: npx opennextjs-cloudflare build && node scripts/build-sw.mjs
+      - name: Deploy to Cloudflare
+        run: npx opennextjs-cloudflare deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

@@ -1,0 +1,33 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tinig-notebook",
+  "main": "worker.mjs",
+  // tiniglabs.digital DNS is on Cloudflare, so the custom domain is created on deploy.
+  "routes": [{ "pattern": "notebook.tiniglabs.digital", "custom_domain": true }],
+  "workers_dev": false,
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "tinig-notebook" }],
+  "r2_buckets": [
+    { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "tinig-notebook-cache" },
+    // Private: no public domain. Holds AES-256-GCM ciphertext only.
+    { "binding": "AUDIO", "bucket_name": "tinig-notebook-audio" }
+  ],
+  // Retries queued IPA transcriptions.
+  "triggers": { "crons": ["*/5 * * * *"] },
+  "ratelimits": [
+    { "name": "REQUEST_LIMITER", "namespace_id": "2001", "simple": { "limit": 5, "period": 60 } },
+    { "name": "OTP_LIMITER", "namespace_id": "2002", "simple": { "limit": 5, "period": 60 } },
+    { "name": "UPLOAD_LIMITER", "namespace_id": "2003", "simple": { "limit": 60, "period": 60 } }
+  ],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "vars": {
+    "ACS_ENDPOINT": "https://tiniglabs-cs.asiapacific.communication.azure.com",
+    "ALERT_FROM": "no-reply@tiniglabs.digital",
+    "CONTACT_ALERT_TO": "hello@tiniglabs.digital"
+  }
+  // Secrets (node scripts/push-secrets.mjs, from .dev.vars): DATABASE_URL, NEON_AUTH_BASE_URL,
+  // NEON_AUTH_COOKIE_SECRET, NOTEBOOK_KEK, MODAL_ENDPOINT_URL, MODAL_TOKEN, CRON_SECRET, ADMIN_EMAILS,
+  // ACS_ACCESS_KEY, TURNSTILE_SECRET_KEY
+}
