@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+/* tinig labs palette: pandan, mint, milk (gatas), ink (tinta), grey (abo). Light only, like tiniglabs.digital. */
+:root {
+  --gatas: #f9fbfa;
+  --tinta: #13261f;
+  --abo: #5f6f68;
+  --pandan: #1f6b4f;
+  --pandan-hover: #185a42;
+  --mint: #e2f3ea;
+  --rose: #b4234a;
+  --line: rgb(19 38 31 / 0.1);
+}
+
+@theme inline {
+  --color-bg: var(--gatas);
+  --color-card: #ffffff;
+  --color-surface: var(--mint);
+  --color-border: var(--line);
+  --color-text: var(--tinta);
+  --color-muted: var(--abo);
+  --color-accent: var(--pandan);
+  --color-accent-hover: var(--pandan-hover);
+  --color-accent-fg: #ffffff;
+  --color-danger: var(--rose);
+  --color-ok: var(--pandan);
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-brand: var(--font-montserrat), var(--font-figtree), sans-serif;
+  --font-ipa: var(--font-noto), "Charis SIL", "Doulos SIL", "Gentium Plus", "Segoe UI", sans-serif;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--gatas);
+  color: var(--tinta);
+}
+
+.ipa {
+  font-family: var(--font-ipa);
+  font-feature-settings: "liga" 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--pandan);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--mint);
+}

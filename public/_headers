@@ -1,0 +1,10 @@
+# Workers Static Assets: headers for files served straight from the asset store (not via Next).
+/*
+  X-Content-Type-Options: nosniff
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+
+/sw.js
+  Cache-Control: no-cache
+  Service-Worker-Allowed: /

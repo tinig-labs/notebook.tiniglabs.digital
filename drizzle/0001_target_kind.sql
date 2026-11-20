@@ -1,0 +1,1 @@
+ALTER TYPE "public"."record_kind" ADD VALUE 'target';

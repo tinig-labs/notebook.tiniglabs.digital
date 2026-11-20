@@ -1,0 +1,2 @@
+# Local tooling only (deploy/run). The container's dependencies are pinned in notebook_phonemes.py.
+modal>=1.6
