@@ -16,3 +16,6 @@ export const NOINDEX = { index: false, follow: false } as const;
 
 // Cloudflare Turnstile site key (public). Same widget as collect.tiniglabs.digital.
 export const TURNSTILE_SITE_KEY = "0x4AAAAAAGFTbJhzvdkMlt9m";
+
+// The notebook's own pages in the shared footer, which adds Brand, GitHub, Terms and Privacy.
+export const FOOTER_LINKS = [{ label: "Contact", href: `mailto:${CONTACT_EMAIL}` }];
