@@ -5,8 +5,8 @@ export const dynamic = "force-static";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/app",
-    name: "Notebook · tinig labs",
-    short_name: "Notebook",
+    name: "tinig labs notebook",
+    short_name: "notebook",
     description: "Record, label and transcribe patient speech. Works offline.",
     start_url: "/app",
     scope: "/",
