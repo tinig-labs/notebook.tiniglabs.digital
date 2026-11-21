@@ -2,7 +2,7 @@
   <a href="https://notebook.tiniglabs.digital">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="public/banner-dark.svg">
-      <img alt="tinig labs" src="public/banner.svg" width="520">
+      <img alt="tinig labs notebook" src="public/banner.svg" width="420">
     </picture>
   </a>
 </h1>
@@ -73,6 +73,7 @@ Every push to `main` deploys to production.
 - [CONTRIBUTING.md](CONTRIBUTING.md): how to report bugs and security problems, and how to propose changes
 - [LICENSING.md](LICENSING.md): which license covers the code, the model code and the data it uses
 - [ACKNOWLEDGEMENTS.md](ACKNOWLEDGEMENTS.md): the software, data, model and services the notebook is built on
+- [BRAND.md](BRAND.md): the tinig labs logo family, colours and type, and how the notebook uses them
 
 ## License
 
