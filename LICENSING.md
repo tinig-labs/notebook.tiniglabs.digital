@@ -8,7 +8,7 @@ This repository holds more than one kind of work, so more than one license appli
 | Model and data-processing code: `modal/` | [AGPL-3.0-or-later](modal/LICENSE) |
 | Phonological feature table in `src/lib/ipa/features.json`, exported from [panphon](https://github.com/dmort27/panphon) | MIT, by David R. Mortensen et al. |
 | Tagalog spelling-to-IPA rules in `src/lib/ipa/g2p-tl.ts`, ported from [epitran](https://github.com/dmort27/epitran) | MIT, by David R. Mortensen et al. |
-| Phoneme model weights | CC BY-NC-SA 4.0, by their authors. They are downloaded at deploy time, not included here, and not covered by the AGPL. The model IPA they produce carries the same non-commercial terms. |
+| POWSM-CTC model weights ([espnet/powsm_ctc](https://huggingface.co/espnet/powsm_ctc)) | CC BY 4.0, by their authors (Bharadwaj et al., *PRiSM*, arXiv:2601.14046). They are downloaded at deploy time, not included here, and not covered by the AGPL. |
 | Patient recordings, IPA, notes and target lists | Not part of this repository. They belong to the SLPs and their patients, and tinig labs processes them only to run the notebook, as set out in the [Terms](https://notebook.tiniglabs.digital/terms). |
 | The tinig labs name and logo | Not licensed. You may not use them to suggest endorsement. |
 

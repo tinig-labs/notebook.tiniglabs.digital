@@ -6,11 +6,12 @@ IPA phone recognition for tinig labs notebook (patient recordings), served on Mo
 Forked from collect.tiniglabs.digital's modal/phonemes.py, with privacy changes:
   * audio arrives in the request body (TLS) instead of by public URL;
   * nothing is written to disk, logged or kept after the response;
-  * clips up to ~2 minutes are split on pauses into <= 15 s windows, the length the model
-    handles well, and IPA is returned per window with timestamps.
+  * clips up to ~2 minutes are split on pauses into <= 20 s windows, the fixed length the
+    model was trained on, and IPA is returned per window with timestamps.
 
-Model: a third-party phoneme model (MODEL_ID below).
-The weights are third-party and licensed CC BY-NC-SA 4.0 (non-commercial, share-alike).
+Model: espnet/powsm_ctc (POWSM-CTC: OWSM-CTC encoder trained on IPAPack++, phone recognition
+task <pr>, language-agnostic prompt <unk>). The weights are third-party and licensed CC BY 4.0
+(commercial use allowed with attribution; see ACKNOWLEDGEMENTS.md for the citation).
 
 Contract (must match src/lib/modal.ts and src/app/api/ipa-callback):
     POST https://<workspace>--tinig-notebook-phonemes-api.modal.run/jobs
@@ -18,7 +19,7 @@ Contract (must match src/lib/modal.ts and src/app/api/ipa-callback):
     Content-Type: audio/wav            (raw WAV bytes; any sample rate, mono or stereo)
  -> { "accepted": true }               (returns at once; the GPU may still be starting)
  Later, Modal POSTs to CALLBACK_URL with the same bearer token:
-    { "job_id", "model": "<phoneme-model>@<commit>", "ipa": "<windows joined with ' | '>",
+    { "job_id", "model": "espnet/powsm_ctc@<commit>", "ipa": "<windows joined with ' | '>",
       "segments": [{ "start": 0.0, "end": 3.2, "ipa": "..." }] }   or   { "job_id", "error" }
  Why: a Worker's background work is cut off after 30 s, and a cold GPU start takes longer.
 
@@ -28,40 +29,49 @@ Try one:  modal run modal/notebook_phonemes.py --wav path/to/clip.wav
 """
 
 
+import re
+
 import modal
 
-MODEL_ID = "<phoneme-model>"
+MODEL_ID = "espnet/powsm_ctc"
+# Pinned: the checkpoint is a pickled .pth, so never load an upload we haven't looked at.
+MODEL_REVISION = "f9d7f5c0e21f4e821b743eeab07344cb2d517d35"
+MODEL_DIR = "exp/s2t_train_conv2d_size768_e9_d9_mel80_raw_bpe40000"
 SAMPLE_RATE = 16_000
 MAX_AUDIO_BYTES = 20_000_000  # 2 min at 48 kHz stereo 16-bit is ~23 MB; the app sends mono
 MAX_SECONDS = 150
 MIN_SAMPLES = SAMPLE_RATE // 10  # 100 ms
 CALLBACK_URL = "https://notebook.tiniglabs.digital/api/ipa-callback"
-WINDOW_S = 15.0  # longest window sent to the model
+WINDOW_S = 20.0  # longest window sent to the model (its training length)
 MIN_WINDOW_S = 4.0  # don't cut shorter than this unless the clip ends
 FRAME_S = 0.03
 
-MODEL_FILES = ["*.json", "*.py", "model.safetensors", "weights/**"]
+MODEL_FILES = ["meta.yaml", "data/token_list/**", "exp/**/*.npz", f"{MODEL_DIR}/config.yaml", f"{MODEL_DIR}/*.pth"]
+PHONE = re.compile(r"^/(.+)/$")  # POWSM writes each phone as its own token, e.g. /pʰ/
 
 
-def download_model() -> None:
+def download_model() -> str:
     from huggingface_hub import snapshot_download
 
-    snapshot_download(MODEL_ID, allow_patterns=MODEL_FILES)
+    return snapshot_download(MODEL_ID, revision=MODEL_REVISION, allow_patterns=MODEL_FILES)
+
+
+def to_ipa(tokens: list[str]) -> str:
+    """Phone tokens (/p/ /ʰ/ ...) to a plain IPA string; language, task and BPE tokens are dropped."""
+    return "".join(m.group(1) for t in tokens if (m := PHONE.match(t)))
 
 
 image = (
-    modal.Image.debian_slim(python_version="3.11")
+    modal.Image.debian_slim(python_version="3.12")
     .apt_install("libsndfile1")
     .pip_install(
-        "torch==2.5.1",
-        "torchaudio==2.5.1",
-        "transformers>=4.44,<5",
+        "torch==2.11.0",
+        "torchaudio==2.11.0",
+        "espnet==202611",
         "huggingface_hub>=0.25",
-        "safetensors",
+        "sentencepiece",
         "soundfile",
-        "numpy<2.3",
-        "pyyaml",
-        "typeguard",
+        "numpy>=2,<2.4",
         "fastapi[standard]",
         "httpx",
     )
@@ -104,15 +114,26 @@ def split_on_pauses(mono, sr: int) -> list[tuple[int, int]]:
 class Phonemes:
     @modal.enter()
     def load(self) -> None:
+        import os
+        from pathlib import Path
+
         import torch
-        from huggingface_hub import snapshot_download
-        from transformers import AutoModel
+        from espnet2.bin.s2t_inference import Speech2Text
 
         self.torch = torch
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model = AutoModel.from_pretrained(MODEL_ID, trust_remote_code=True).to(self.device).eval()
-        snap = snapshot_download(MODEL_ID, allow_patterns=MODEL_FILES)
-        self.version = f"{MODEL_ID}@{snap.rstrip('/').split('/')[-1][:12]}"
+        snap = Path(download_model())  # already in the image; HF_HUB_OFFLINE keeps this local
+        os.chdir(snap)  # config.yaml names the BPE model and feature stats relative to the repo root
+        model_file = next((snap / MODEL_DIR).glob("*.pth"))
+        self.s2t = Speech2Text(
+            s2t_train_config=str(snap / MODEL_DIR / "config.yaml"),
+            s2t_model_file=str(model_file),
+            device=self.device,
+            lang_sym="<unk>",  # no Tagalog token; phone recognition works without a language
+            task_sym="<pr>",
+        )
+        self.window = SAMPLE_RATE * int(WINDOW_S)
+        self.version = f"{MODEL_ID}@{MODEL_REVISION[:12]}"
 
     def _transcribe(self, data: bytes) -> dict:
         import io
@@ -132,9 +153,11 @@ class Phonemes:
 
         segments = []
         for a, b in split_on_pauses(mono.numpy(), SAMPLE_RATE):
+            # Trained on fixed 20 s inputs: pad the window with silence, as the model card asks.
+            chunk = self.torch.nn.functional.pad(mono[a:b], (0, max(0, self.window - (b - a))))
             with self.torch.inference_mode():
-                out = self.model.transcribe(mono[a:b].to(self.device), sampling_rate=SAMPLE_RATE)
-            ipa = out[0]["processed_transcript"].strip()
+                _, tokens, *_ = self.s2t.best_path(chunk)[0]  # CTC-only: argmax path, no search
+            ipa = to_ipa(tokens)
             if ipa:
                 segments.append({"start": round(a / SAMPLE_RATE, 2), "end": round(b / SAMPLE_RATE, 2), "ipa": ipa})
         return {"model": self.version, "ipa": " | ".join(s["ipa"] for s in segments), "segments": segments}
