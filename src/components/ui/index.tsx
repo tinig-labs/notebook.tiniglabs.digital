@@ -1,16 +1,17 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 
-// Controls follow tiniglabs.digital: pandan primary, mint hovers, white cards with 28px radius.
+// Controls follow BRAND.md and tiniglabs.digital: pill buttons, pandan primary, mint hovers,
+// white radius-lg cards with a hairline, radius-md fields with a 3:1 outline.
 type Variant = "primary" | "secondary" | "ghost" | "danger";
 const variants: Record<Variant, string> = {
   primary: "bg-accent text-accent-fg hover:bg-accent-hover active:translate-y-px",
   secondary: "bg-card text-text ring-1 ring-inset ring-border hover:bg-surface",
   ghost: "text-text/70 hover:bg-surface hover:text-text",
-  danger: "bg-card text-danger ring-1 ring-inset ring-border hover:bg-[#fbeef1]",
+  danger: "bg-card text-danger ring-1 ring-inset ring-border hover:bg-[var(--soda-o-tint)]",
 };
 const base =
-  "inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-semibold transition-[background-color,transform] duration-150 disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold transition-[background-color,transform] duration-150 disabled:pointer-events-none disabled:opacity-50";
 
 export function Button({ variant = "primary", className = "", ...p }: ComponentProps<"button"> & { variant?: Variant }) {
   return <button className={`${base} ${variants[variant]} ${className}`} {...p} />;
@@ -21,7 +22,7 @@ export function ButtonLink({ variant = "primary", className = "", ...p }: Compon
 }
 
 const field =
-  "h-12 w-full rounded-xl bg-card px-4 text-base sm:text-[0.9375rem] ring-1 ring-inset ring-[var(--tinta)]/15 placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent";
+  "h-12 w-full rounded-panel bg-card px-4 text-base sm:text-[0.9375rem] ring-1 ring-inset ring-[var(--abo)]/75 placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent";
 
 export function Input({ className = "", ...p }: ComponentProps<"input">) {
   return <input className={`${field} ${className}`} {...p} />;
@@ -42,7 +43,7 @@ export function Field({ label, hint, children }: { label: string; hint?: string;
 }
 
 export function Card({ className = "", ...p }: ComponentProps<"div">) {
-  return <div className={`rounded-[28px] bg-card p-6 sm:p-8 ${className}`} {...p} />;
+  return <div className={`rounded-card bg-card p-6 ring-1 ring-inset ring-border sm:p-8 ${className}`} {...p} />;
 }
 
 export function Badge({ children }: { children: ReactNode }) {
@@ -54,7 +55,7 @@ export function Badge({ children }: { children: ReactNode }) {
 }
 
 export function Kbd({ children }: { children: ReactNode }) {
-  return <kbd className="rounded-md bg-card px-1.5 py-0.5 font-sans text-xs text-muted ring-1 ring-border">{children}</kbd>;
+  return <kbd className="rounded-tag bg-card px-1.5 py-0.5 font-sans text-xs text-muted ring-1 ring-border">{children}</kbd>;
 }
 
 export function PageHeader({ title, children }: { title: string; children?: ReactNode }) {
@@ -92,7 +93,7 @@ export function Segmented<T extends string | number>({
 export function Textarea({ className = "", ...p }: ComponentProps<"textarea">) {
   return (
     <textarea
-      className={`min-h-24 w-full rounded-xl bg-card px-4 py-3 text-base ring-1 ring-inset ring-[var(--tinta)]/15 placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent sm:text-[0.9375rem] ${className}`}
+      className={`min-h-24 w-full rounded-panel bg-card px-4 py-3 text-base ring-1 ring-inset ring-[var(--abo)]/75 placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent sm:text-[0.9375rem] ${className}`}
       {...p}
     />
   );
@@ -126,7 +127,7 @@ export function Chip({ on, className = "", ...p }: ComponentProps<"button"> & { 
 
 export function EmptyState({ icon, title, children }: { icon: ReactNode; title: string; children?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-[28px] bg-surface px-6 py-12 text-center">
+    <div className="flex flex-col items-center gap-3 rounded-card bg-surface px-6 py-12 text-center">
       <span className="flex size-14 items-center justify-center rounded-full bg-card text-accent">{icon}</span>
       <p className="text-lg font-semibold">{title}</p>
       {children && <div className="max-w-[40ch] text-sm text-muted">{children}</div>}

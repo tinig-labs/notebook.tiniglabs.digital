@@ -79,7 +79,7 @@ export function PatientForm({
         <Textarea name="notes" defaultValue={initial?.notes} maxLength={4000} />
       </Field>
 
-      <fieldset className="space-y-3 rounded-[20px] bg-surface p-4">
+      <fieldset className="space-y-3 rounded-panel bg-surface p-4">
         <legend className="sr-only">Consent</legend>
         <label className="flex items-start gap-3 text-sm">
           <input

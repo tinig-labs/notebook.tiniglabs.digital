@@ -186,7 +186,7 @@ function PatientView() {
                     type="button"
                     aria-pressed={on}
                     onClick={() => setTargetFilter(on ? null : t.id)}
-                    className={`flex w-full items-center gap-3 rounded-[20px] bg-card p-3 text-left ring-1 ring-inset ${on ? "ring-2 ring-accent" : "ring-border"}`}
+                    className={`flex w-full items-center gap-3 rounded-panel bg-card p-3 text-left ring-1 ring-inset ${on ? "ring-2 ring-accent" : "ring-border"}`}
                   >
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold">{t.text}</span>
@@ -219,7 +219,7 @@ function PatientView() {
       )}
 
       {compare && (
-        <section aria-label="Compare recordings" className="rounded-[28px] bg-surface p-3">
+        <section aria-label="Compare recordings" className="rounded-card bg-surface p-3">
           {compare.length < 2 ? (
             <p className="px-3 py-4 text-sm text-muted">Pick two recordings below to compare.</p>
           ) : (
@@ -228,7 +228,7 @@ function PatientView() {
                 const r = recordings.find((x) => x.id === rid);
                 if (!r) return null;
                 return (
-                  <div key={rid} className="space-y-3 rounded-[20px] bg-card p-4">
+                  <div key={rid} className="space-y-3 rounded-panel bg-card p-4">
                     <p className="text-sm font-semibold">
                       {fmtDate(r.value.recordedAt)} · {r.value.target || "Untitled"}
                     </p>
@@ -262,7 +262,7 @@ function PatientView() {
                   const nErr = rv ? rv.ops.filter((o) => o.finalType !== "C").length : 0;
                   const picked = compare?.includes(r.id);
                   return (
-                    <li key={r.id} className={`flex items-center gap-3 rounded-[20px] bg-card p-3 ring-1 ring-inset ${picked ? "ring-2 ring-accent" : "ring-border"}`}>
+                    <li key={r.id} className={`flex items-center gap-3 rounded-panel bg-card p-3 ring-1 ring-inset ${picked ? "ring-2 ring-accent" : "ring-border"}`}>
                       {compare ? (
                         <input
                           type="checkbox"
@@ -289,7 +289,7 @@ function PatientView() {
                           })}
                           {!r.value.ipaEdited && <IpaStatus status={r.ipaStatus} />}
                           {rv && (
-                            <span className={`text-xs font-semibold ${nErr ? "text-[#8a5a12]" : "text-accent"}`}>
+                            <span className={`text-xs font-semibold ${nErr ? "text-[var(--soda-s-ink)]" : "text-accent"}`}>
                               PCC {pct(rv.metrics.pcc)} · {nErr ? `${nErr} error${nErr === 1 ? "" : "s"}` : "no errors"}
                             </span>
                           )}

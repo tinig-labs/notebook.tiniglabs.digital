@@ -47,7 +47,7 @@ export function HeaderActions() {
   );
 }
 
-const big = "inline-flex h-14 items-center gap-2 rounded-2xl px-7 text-base font-semibold";
+const big = "inline-flex h-14 items-center gap-2 rounded-full px-7 text-base font-semibold";
 
 export function HeroActions() {
   const signedIn = useSignedIn();
