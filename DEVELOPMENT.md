@@ -25,7 +25,9 @@ store a copy in the password manager / offline, never in the repo.
 2. **R2**: buckets `tinig-notebook-audio` (private, no public domain, location hint APAC) and
    `tinig-notebook-cache`. Audio goes through the Worker binding, so no S3 keys or CORS are needed.
 3. **Modal**: `modal secret create tinig-notebook-phonemes PHONEMES_TOKEN=<random>` then
-   `modal deploy modal/notebook_phonemes.py`. Put the URL and token in `MODAL_ENDPOINT_URL` / `MODAL_TOKEN`.
+   `npm run deploy:modal`. Put the URL and token in `MODAL_ENDPOINT_URL` / `MODAL_TOKEN`.
+   After that, a merge to `main` that touches `modal/` redeploys it (`.github/workflows/deploy-modal.yml`),
+   using the `MODAL_TOKEN_ID` / `MODAL_TOKEN_SECRET` repo secrets from `modal token new`.
 4. **Secrets**: fill `.dev.vars` with production values, `node scripts/push-secrets.mjs`.
 5. **Deploy**: push to `main` (GitHub Actions) or `npm run deploy`. The custom domain is created from `wrangler.jsonc`.
 6. **Admins**: `ADMIN_EMAILS` can always sign in and see `/admin`, where beta requests are approved.
@@ -37,7 +39,11 @@ Migrations are not run by CI: run `npm run db:migrate` before the deploy that ne
 `https://staging.notebook.tiniglabs.digital`: Worker `tinig-notebook-staging` (`env.staging` in
 `wrangler.jsonc`), R2 buckets `tinig-notebook-staging-audio` / `-cache`, and a **schema-only**
 Neon branch `staging`, so it never holds production patients or users. It has its own Neon Auth,
-KEK and cookie secret, and no Modal (transcriptions stay queued).
+KEK and cookie secret, and its own Modal app `tinig-notebook-phonemes-staging`, whose results go back
+to staging only. Deploy a branch's `modal/` there before merging: run the **Deploy Modal** workflow on
+that branch with environment `staging`, or `npm run deploy:modal:staging`. One-time setup:
+`modal secret create tinig-notebook-phonemes-staging PHONEMES_TOKEN=<random>`, then put the staging
+app's URL and that token in `.dev.vars.staging` as `MODAL_ENDPOINT_URL` / `MODAL_TOKEN`.
 
 ```bash
 # .dev.vars.staging: the staging branch's URLs and staging-only secrets (gitignored)
