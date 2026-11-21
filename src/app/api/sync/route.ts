@@ -1,7 +1,6 @@
 import { and, asc, eq, gt, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
-import { apiUser } from "@/lib/session";
-import { checkDevice, missingDeviceResponse, revokedResponse } from "@/lib/devices";
+import { deviceUser as guard } from "@/lib/devices";
 import { audioBucket, later } from "@/lib/cf";
 import { SYNC_BATCH } from "@/lib/constants";
 
@@ -25,15 +24,6 @@ const out = (r: schema.RecordRow) => ({
   audioUploaded: r.audioUploaded,
   ipaStatus: r.ipaStatus,
 });
-
-async function guard(r: Request) {
-  const { user, error } = await apiUser();
-  if (error) return { error };
-  const d = await checkDevice(user.id, r);
-  if (d === "revoked") return { error: revokedResponse() };
-  if (d === "missing") return { error: missingDeviceResponse() };
-  return { user };
-}
 
 export async function GET(r: Request) {
   const g = await guard(r);

@@ -13,35 +13,50 @@ export type BootState =
   | { phase: "error"; message: string };
 
 /**
- * Opens the notebook on this device. Online: refresh the key and identity from the server.
- * Offline: use the key already stored here, so the app keeps working in a clinic with no signal.
+ * Opens the notebook on this device. Online: the server must vouch for the session before the
+ * local copy opens, so a shared phone never shows one person's patients to the next.
+ * Offline (or server trouble): use the key already stored here, so the app keeps working in a
+ * clinic with no signal.
  */
-async function boot(): Promise<BootState> {
+async function boot(retried = false): Promise<BootState> {
   let key = await loadKey();
   let me = await loadMe();
 
   if (navigator.onLine) {
+    let res: Response | null = null;
     try {
-      const res = await fetch("/api/keys", { headers: { "x-device-id": await deviceId() }, cache: "no-store" });
-      if (res.status === 401 || res.status === 403 || res.status === 410) {
-        // Signed out, access removed, or device revoked: drop local data (it may be someone else's next).
-        if (res.status !== 401 || !key) {
-          await wipeLocal();
-          return { phase: "needs-sign-in" };
-        }
-        // Session expired but this device is set up: keep working, sync waits for sign-in.
-      } else if (res.ok) {
-        const j = (await res.json()) as { key: string; user: Me };
-        const stored = await storeKey(j.key, j.user);
-        if (stored.switched) {
-          await wipeLocal();
-          return boot();
-        }
-        key = stored.key;
-        me = j.user;
-      }
+      res = await fetch("/api/keys", { headers: { "x-device-id": await deviceId() }, cache: "no-store" });
     } catch {
       // Network blip: fall through to the local key.
+    }
+    if (res?.status === 401) {
+      // Session expired: sign in again first. Local data stays, so the same person keeps any
+      // unsynced work; if someone else signs in, the checks below wipe it.
+      return { phase: "needs-sign-in" };
+    }
+    if (res?.status === 403 || res?.status === 410) {
+      // Access removed or device revoked: drop local data.
+      await wipeLocal();
+      return { phase: "needs-sign-in" };
+    }
+    if (res?.status === 409) {
+      // /api/keys only answers 409 for DEVICE_TAKEN.
+      // This install belongs to another account: a different person signed in on this browser.
+      await wipeLocal();
+      return retried ? { phase: "error", message: "This device is set up for another account." } : boot(true);
+    }
+    if (res?.ok) {
+      const j = (await res.json()) as { key: string; user: Me };
+      const stored = await storeKey(j.key, j.user);
+      if (stored.switched) {
+        await wipeLocal();
+        return retried ? { phase: "error", message: "Couldn't switch accounts on this device." } : boot(true);
+      }
+      key = stored.key;
+      me = j.user;
+    } else if (res && res.status < 500 && res.status !== 429) {
+      // Any other refusal: don't open the local copy on the server's say-so being unclear.
+      return { phase: "error", message: `Couldn't open the notebook (HTTP ${res.status}).` };
     }
   }
 
@@ -59,7 +74,7 @@ export function useBoot() {
   const [state, setState] = useState<BootState>({ phase: "loading" });
   useEffect(() => {
     let live = true;
-    (once ??= boot().catch((e) => ({ phase: "error", message: e instanceof Error ? e.message : String(e) }) as BootState)).then(
+    (once ??= boot(false).catch((e) => ({ phase: "error", message: e instanceof Error ? e.message : String(e) }) as BootState)).then(
       (s) => live && setState(s),
     );
     return () => {

@@ -1,6 +1,6 @@
 import { and, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
-import { apiUser } from "@/lib/session";
+import { deviceUser } from "@/lib/devices";
 import { audioBucket, rateLimit } from "@/lib/cf";
 import { MAX_AUDIO_BYTES } from "@/lib/constants";
 
@@ -21,8 +21,9 @@ async function own(userId: string, id: string) {
 }
 
 export async function PUT(r: Request, c: Ctx) {
-  const { user, error } = await apiUser();
-  if (error) return error;
+  const g = await deviceUser(r);
+  if (g.error) return g.error;
+  const { user } = g;
   const { id } = await c.params;
   if (!(await rateLimit("UPLOAD_LIMITER", user.id))) return Response.json({ error: "Slow down." }, { status: 429 });
   // The recording row is synced first, so it must already exist and belong to this user.
@@ -44,9 +45,10 @@ export async function PUT(r: Request, c: Ctx) {
   return Response.json({ ok: true });
 }
 
-export async function GET(_r: Request, c: Ctx) {
-  const { user, error } = await apiUser();
-  if (error) return error;
+export async function GET(r: Request, c: Ctx) {
+  const g = await deviceUser(r);
+  if (g.error) return g.error;
+  const { user } = g;
   const { id } = await c.params;
   if (!(await own(user.id, id))) return Response.json({ error: "Not found" }, { status: 404 });
   const obj = await audioBucket().get(id);

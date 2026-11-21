@@ -5,7 +5,7 @@ import { connection } from "next/server";
 import { auth } from "@/lib/auth/server";
 import { isAdminEmail, isAllowed } from "@/lib/allowlist";
 
-export type CurrentUser = { id: string; email: string; name: string; admin: boolean };
+export type CurrentUser = { id: string; email: string; name: string; admin: boolean; sessionId: string | null };
 
 /** Session for an approved beta user, memoised per request. Null when signed out or not approved. */
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
@@ -21,7 +21,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   if (!u) return null;
   // Access can be revoked after sign-in, so check on every request, not only at sign-in.
   if (!(await isAllowed(u.email))) return null;
-  return { id: u.id, email: u.email, name: u.name, admin: isAdminEmail(u.email) };
+  return { id: u.id, email: u.email, name: u.name, admin: isAdminEmail(u.email), sessionId: session?.session?.id ?? null };
 });
 
 export async function requireAdmin() {
