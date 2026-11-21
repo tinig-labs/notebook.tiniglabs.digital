@@ -9,6 +9,7 @@ import { useBoot } from "@/lib/local/boot";
 import { syncNow, useSyncStatus } from "@/lib/local/sync";
 import { ButtonLink, EmptyState } from "./ui";
 import { SiteFooter } from "./site-footer";
+import { FOOTER_LINKS } from "@/lib/constants";
 
 const TABS = [
   { href: "/app", label: "Patients", icon: Users, exact: true },
@@ -107,7 +108,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-5 pb-4 pt-2 sm:px-10 sm:pb-8 sm:pt-2">{body}</main>
-      <SiteFooter variant="app" />
+      <SiteFooter current="notebook" links={FOOTER_LINKS} compact />
 
       <nav
         aria-label="Main"
