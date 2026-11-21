@@ -9,6 +9,7 @@
     "lint": "eslint",
     "preview": "opennextjs-cloudflare build && node scripts/build-sw.mjs --open-next && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && node scripts/build-sw.mjs --open-next && opennextjs-cloudflare deploy",
+    "deploy:staging": "opennextjs-cloudflare build && node scripts/build-sw.mjs --open-next && opennextjs-cloudflare deploy --env staging",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
