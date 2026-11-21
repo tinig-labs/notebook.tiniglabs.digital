@@ -12,14 +12,22 @@ const description = "Record, label and transcribe patient speech. Works offline,
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: "Notebook · tinig labs", template: "%s · tinig labs notebook" },
+  title: { default: "tinig labs notebook", template: "%s · tinig labs notebook" },
   description,
-  applicationName: "Notebook",
+  applicationName: "tinig labs notebook",
   authors: [{ name: "tinig labs", url: MAIN_SITE_URL }],
-  icons: { icon: "/logo.svg", apple: "/icons/apple-touch-icon.png" },
-  appleWebApp: { capable: true, title: "Notebook", statusBarStyle: "default" },
+  // App icons from the approved logo files (public/brand): the 32 px PNG for favicons, as the guide says.
+  icons: {
+    icon: [
+      { url: "/brand/notebook-app-icon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/brand/notebook-app-icon.svg", type: "image/svg+xml" },
+    ],
+    apple: { url: "/icons/apple-touch-icon.png", sizes: "180x180" },
+  },
+  appleWebApp: { capable: true, title: "notebook", statusBarStyle: "default" },
   formatDetection: { telephone: false },
   openGraph: { type: "website", siteName: "tinig labs", locale: "en_PH", description },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#f9fbfa" };

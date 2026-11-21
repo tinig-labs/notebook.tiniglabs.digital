@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Brand, Wordmark } from "./brand";
+import { Brand, LabMark, Wordmark } from "./brand";
 import { CONTACT_EMAIL, MAIN_SITE_URL } from "@/lib/constants";
 
 // Same structure as the footers on tiniglabs.digital and collect.tiniglabs.digital.
@@ -9,6 +9,7 @@ const FOOTER_LINKS = [
   { label: "Contact", href: `mailto:${CONTACT_EMAIL}` },
   { label: "Terms of Service", href: "/terms", short: "Terms" },
   { label: "Privacy notice", href: "/privacy", short: "Privacy" },
+  { label: "Brand", href: "/brand" },
 ];
 
 const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--pandan)]";
@@ -58,16 +59,19 @@ export function SiteFooter({ variant = "site" }: { variant?: "site" | "app" }) {
               ))}
             </ul>
           </nav>
-          <p className="mt-3 text-xs leading-relaxed text-muted">
-            <Brand>tinig</Brand> is Filipino for voice. © 2026 <Brand />
-          </p>
+          <a href={MAIN_SITE_URL} className={`mt-4 inline-flex items-center gap-2 rounded-sm text-xs leading-relaxed text-muted hover:text-text ${focusRing}`}>
+            <LabMark size={24} />
+            <span>
+              <Brand>tinig</Brand> is Filipino for voice. © 2026 <Brand />
+            </span>
+          </a>
         </div>
       )}
 
       <div className={app ? "hidden sm:block" : ""}>
         <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
           <Link href="/" aria-label="Notebook home" className={`self-start rounded-sm ${focusRing}`}>
-            <Wordmark size="sm" />
+            <Wordmark />
           </Link>
           <nav aria-label="Footer">
             <ul className="grid grid-cols-2 gap-x-6 text-[0.9375rem] font-medium sm:flex sm:flex-wrap sm:gap-x-7 sm:gap-y-3 sm:text-sm">
@@ -83,13 +87,16 @@ export function SiteFooter({ variant = "site" }: { variant?: "site" | "app" }) {
             </ul>
           </nav>
         </div>
-        <div className="mt-8 flex flex-col gap-1.5 border-t border-border pt-6 text-sm leading-relaxed text-muted sm:flex-row sm:justify-between">
+        <div className="mt-8 flex flex-col gap-1.5 border-t border-border pt-6 text-sm leading-relaxed text-muted sm:flex-row sm:items-center sm:justify-between">
           <p>
             <Brand>tinig</Brand> is Filipino for voice.
           </p>
-          <p>
-            © 2026 <Brand />, an independent lab
-          </p>
+          <a href={MAIN_SITE_URL} className={`inline-flex items-center gap-2 self-start rounded-sm hover:text-text ${focusRing}`}>
+            <LabMark size={24} />
+            <span>
+              © 2026 <Brand />, an independent lab
+            </span>
+          </a>
         </div>
       </div>
     </footer>

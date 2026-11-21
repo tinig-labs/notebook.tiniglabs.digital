@@ -15,7 +15,7 @@ const walk = (dir) =>
 
 const assets = walk(root)
   .map((p) => "/" + relative(root, p).split(sep).join("/"))
-  .filter((u) => /^\/(_next\/static\/|worklets\/|icons\/|logo\.svg$)/.test(u))
+  .filter((u) => /^\/(_next\/static\/|worklets\/|icons\/|brand\/(notebook|tinig-labs)-mark[\w-]*\.svg$)/.test(u))
   .filter((u) => !u.endsWith(".map"))
   .sort();
 
