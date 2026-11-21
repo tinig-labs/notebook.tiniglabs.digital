@@ -117,7 +117,7 @@ function RecordView() {
 
   return (
     <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:items-start">
-      <section aria-labelledby="setup-title" className="space-y-5 rounded-[28px] bg-card p-5 ring-1 ring-inset ring-border sm:p-6 lg:sticky lg:top-6">
+      <section aria-labelledby="setup-title" className="space-y-5 rounded-card bg-card p-5 ring-1 ring-inset ring-border sm:p-6 lg:sticky lg:top-6">
         <h1 id="setup-title" className="text-2xl font-semibold tracking-tight">
           Record
         </h1>
@@ -155,8 +155,8 @@ function RecordView() {
 
       <section aria-label="Recorder" className="space-y-3">
         <div
-          className={`relative flex min-h-[22rem] flex-col items-center justify-between gap-6 overflow-hidden rounded-[28px] p-6 text-center transition-colors sm:min-h-[26rem] sm:p-10 ${
-            recording ? "bg-[#fbeef1]" : "bg-surface"
+          className={`relative flex min-h-[22rem] flex-col items-center justify-between gap-6 overflow-hidden rounded-card p-6 text-center transition-colors sm:min-h-[26rem] sm:p-10 ${
+            recording ? "bg-[var(--soda-o-tint)]" : "bg-surface"
           }`}
         >
           <div className="flex w-full items-center justify-between gap-3 text-sm">
@@ -189,7 +189,7 @@ function RecordView() {
           </div>
 
           {blocked ? (
-            <div className="flex items-start gap-3 rounded-[20px] bg-card p-4 text-left text-sm text-danger">
+            <div className="flex items-start gap-3 rounded-panel bg-card p-4 text-left text-sm text-danger">
               <ShieldAlert size={20} className="shrink-0" aria-hidden="true" />
               <span>
                 Record consent before recording.{" "}

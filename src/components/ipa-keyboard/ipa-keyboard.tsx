@@ -38,7 +38,7 @@ export function IpaKeyboard({ value, onChange, targetRef }: Props) {
     });
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-[var(--gatas)] ring-1 ring-inset ring-border" onMouseDown={(e) => e.preventDefault()}>
+    <div className="overflow-hidden rounded-panel bg-[var(--gatas)] ring-1 ring-inset ring-border" onMouseDown={(e) => e.preventDefault()}>
       <div role="tablist" aria-label="IPA symbol groups" className="flex gap-1 overflow-x-auto border-b border-border p-2">
         {IPA_TABS.map((t) => (
           <button
@@ -74,7 +74,7 @@ export function IpaKeyboard({ value, onChange, targetRef }: Props) {
                   onMouseEnter={() => setHover(sy)}
                   onMouseLeave={() => setHover(null)}
                   onFocus={() => setHover(sy)}
-                  className="ipa h-11 min-w-11 rounded-xl bg-card px-2 text-lg leading-none ring-1 ring-inset ring-border transition-colors hover:bg-surface hover:ring-accent/40 active:translate-y-px"
+                  className="ipa h-11 min-w-11 rounded-tag bg-card px-2 text-lg leading-none ring-1 ring-inset ring-border transition-colors hover:bg-surface hover:ring-accent/40 active:translate-y-px"
                 >
                   {sy.combining ? `◌${sy.s}` : sy.s}
                 </button>
@@ -95,10 +95,10 @@ export function IpaKeyboard({ value, onChange, targetRef }: Props) {
             "Diacritics attach to the preceding symbol."
           )}
         </span>
-        <button type="button" onClick={() => insert(" ")} className="h-10 w-24 rounded-xl bg-card text-xs font-medium text-muted ring-1 ring-inset ring-border hover:bg-surface">
+        <button type="button" onClick={() => insert(" ")} className="h-10 w-24 rounded-tag bg-card text-xs font-medium text-muted ring-1 ring-inset ring-border hover:bg-surface">
           space
         </button>
-        <button type="button" onClick={backspace} aria-label="Backspace" className="h-10 w-12 rounded-xl bg-card ring-1 ring-inset ring-border hover:bg-surface">
+        <button type="button" onClick={backspace} aria-label="Backspace" className="h-10 w-12 rounded-tag bg-card ring-1 ring-inset ring-border hover:bg-surface">
           ⌫
         </button>
       </div>

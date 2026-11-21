@@ -67,13 +67,13 @@ export function RecordingPlayer({ id, label = "Recording" }: { id: string; label
   const s = state?.id === id ? state : null;
   if (!s)
     return (
-      <div className="flex h-14 items-center gap-2 rounded-[20px] bg-surface px-4 text-sm text-muted">
+      <div className="flex h-14 items-center gap-2 rounded-panel bg-surface px-4 text-sm text-muted">
         <LoaderCircle size={16} className="animate-spin motion-reduce:animate-none" aria-hidden="true" /> Loading audio…
       </div>
     );
   if (!s.url)
     return (
-      <div className="flex h-14 items-center gap-2 rounded-[20px] bg-surface px-4 text-sm text-muted">
+      <div className="flex h-14 items-center gap-2 rounded-panel bg-surface px-4 text-sm text-muted">
         <AlertCircle size={16} aria-hidden="true" /> Audio not on this device yet. Connect to download it.
       </div>
     );

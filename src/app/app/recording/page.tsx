@@ -34,7 +34,7 @@ function Editor({ id, initial, patientName }: { id: string; initial: Recording; 
 
   return (
     <>
-      <section aria-labelledby="details-title" className="space-y-4 rounded-[28px] bg-card p-5 ring-1 ring-inset ring-border sm:p-6">
+      <section aria-labelledby="details-title" className="space-y-4 rounded-card bg-card p-5 ring-1 ring-inset ring-border sm:p-6">
         <h2 id="details-title" className="font-semibold">
           Details
         </h2>
@@ -138,7 +138,7 @@ function RecordingView() {
 
       <RecordingPlayer id={id} />
 
-      <section aria-labelledby="review-title" className="space-y-4 rounded-[28px] bg-surface p-5 sm:p-6">
+      <section aria-labelledby="review-title" className="space-y-4 rounded-card bg-surface p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
           <h2 id="review-title" className="flex items-center gap-2 font-semibold">
             <ListChecks size={18} className="text-accent" aria-hidden="true" /> Patient&apos;s IPA vs target

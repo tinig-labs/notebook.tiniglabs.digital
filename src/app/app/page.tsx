@@ -113,7 +113,7 @@ export default function PatientsPage() {
               />
             </div>
 
-            <div className="overflow-hidden rounded-[28px] bg-card ring-1 ring-inset ring-border">
+            <div className="overflow-hidden rounded-card bg-card ring-1 ring-inset ring-border">
               <div className={`hidden px-5 py-3 text-xs font-semibold text-muted ${COLS}`} aria-hidden="true">
                 <span>Patient</span>
                 <span>Focus</span>
@@ -158,7 +158,7 @@ export default function PatientsPage() {
                         <span className="hidden truncate text-sm text-text/80 md:block">{p.value.diagnosis ?? <span className="text-muted">—</span>}</span>
                         <span className="hidden text-sm md:block">
                           <span className="tabular-nums">{s?.count ?? 0}</span>
-                          {s?.toReview ? <span className="ml-2 rounded-full bg-[#fbf1df] px-2 py-0.5 text-xs font-semibold text-[#8a5a12]">{s.toReview} to review</span> : null}
+                          {s?.toReview ? <span className="ml-2 rounded-full bg-[var(--soda-s-tint)] px-2 py-0.5 text-xs font-semibold text-[var(--soda-s-ink)]">{s.toReview} to review</span> : null}
                         </span>
                         <span className="hidden text-sm tabular-nums text-text/80 md:block">{s ? fmtDate(s.last) : <span className="text-muted">—</span>}</span>
                         <span className="hidden text-right text-sm font-semibold tabular-nums md:block">{s?.pcc != null ? pct(s.pcc) : <span className="font-normal text-muted">—</span>}</span>

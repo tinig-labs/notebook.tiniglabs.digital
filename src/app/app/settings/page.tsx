@@ -101,7 +101,7 @@ export default function SettingsPage() {
         </p>
         <div className="flex flex-wrap gap-2">
           {me?.admin && (
-            <a href="/admin" className="inline-flex h-11 items-center rounded-2xl px-5 text-sm font-semibold text-accent hover:bg-surface">
+            <a href="/admin" className="inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold text-accent hover:bg-surface">
               Beta admin
             </a>
           )}
