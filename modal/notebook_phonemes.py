@@ -14,7 +14,7 @@ task <pr>, language-agnostic prompt <unk>). The weights are third-party and lice
 (commercial use allowed with attribution; see ACKNOWLEDGEMENTS.md for the citation).
 
 Contract (must match src/lib/modal.ts and src/app/api/ipa-callback):
-    POST https://<workspace>--tinig-notebook-phonemes-api.modal.run/jobs
+    POST https://<workspace>--<app name>-api.modal.run/jobs
     Authorization: Bearer <PHONEMES_TOKEN>, X-Job-Id: <recording id>
     Content-Type: audio/wav            (raw WAV bytes; any sample rate, mono or stereo)
  -> { "accepted": true }               (returns at once; the GPU may still be starting)
@@ -23,15 +23,35 @@ Contract (must match src/lib/modal.ts and src/app/api/ipa-callback):
       "segments": [{ "start": 0.0, "end": 3.2, "ipa": "..." }] }   or   { "job_id", "error" }
  Why: a Worker's background work is cut off after 30 s, and a cold GPU start takes longer.
 
+Environments: NOTEBOOK_ENV picks production (default) or staging. Each has its own app, secret
+and callback, so staging can never post results into production:
+    production  app tinig-notebook-phonemes          -> https://notebook.tiniglabs.digital
+    staging     app tinig-notebook-phonemes-staging  -> https://staging.notebook.tiniglabs.digital
+
 Setup:    modal secret create tinig-notebook-phonemes PHONEMES_TOKEN=<long random string>
-Deploy:   modal deploy modal/notebook_phonemes.py
+          modal secret create tinig-notebook-phonemes-staging PHONEMES_TOKEN=<another one>
+Deploy:   merging to main deploys production (.github/workflows/deploy-modal.yml), or by hand:
+          npm run deploy:modal / npm run deploy:modal:staging
 Try one:  modal run modal/notebook_phonemes.py --wav path/to/clip.wav
 """
 
 
+import os
 import re
 
 import modal
+
+# Read at deploy time and baked into both images below, because Modal re-imports this file
+# inside each container, where the deploy shell's environment isn't present.
+ENV = os.environ.get("NOTEBOOK_ENV", "production")
+ENVIRONMENTS = {
+    "production": ("tinig-notebook-phonemes", "https://notebook.tiniglabs.digital"),
+    "staging": ("tinig-notebook-phonemes-staging", "https://staging.notebook.tiniglabs.digital"),
+}
+if ENV not in ENVIRONMENTS:
+    raise ValueError(f"NOTEBOOK_ENV must be one of {sorted(ENVIRONMENTS)}, not {ENV!r}")
+APP_NAME, ORIGIN = ENVIRONMENTS[ENV]
+SECRET_NAME = APP_NAME  # holds PHONEMES_TOKEN, shared with that environment's Worker as MODAL_TOKEN
 
 MODEL_ID = "espnet/powsm_ctc"
 # Pinned: the checkpoint is a pickled .pth, so never load an upload we haven't looked at.
@@ -41,7 +61,7 @@ SAMPLE_RATE = 16_000
 MAX_AUDIO_BYTES = 20_000_000  # 2 min at 48 kHz stereo 16-bit is ~23 MB; the app sends mono
 MAX_SECONDS = 150
 MIN_SAMPLES = SAMPLE_RATE // 10  # 100 ms
-CALLBACK_URL = "https://notebook.tiniglabs.digital/api/ipa-callback"
+CALLBACK_URL = f"{ORIGIN}/api/ipa-callback"
 WINDOW_S = 20.0  # longest window sent to the model (its training length)
 MIN_WINDOW_S = 4.0  # don't cut shorter than this unless the clip ends
 FRAME_S = 0.03
@@ -75,12 +95,12 @@ image = (
         "fastapi[standard]",
         "httpx",
     )
-    .env({"HF_HOME": "/models/hf"})
+    .env({"HF_HOME": "/models/hf", "NOTEBOOK_ENV": ENV})
     .run_function(download_model)
     .env({"HF_HUB_OFFLINE": "1"})
 )
 
-app = modal.App("tinig-notebook-phonemes", image=image)
+app = modal.App(APP_NAME, image=image)
 
 
 def split_on_pauses(mono, sr: int) -> list[tuple[int, int]]:
@@ -106,7 +126,7 @@ def split_on_pauses(mono, sr: int) -> list[tuple[int, int]]:
 
 @app.cls(
     gpu="T4",
-    secrets=[modal.Secret.from_name("tinig-notebook-phonemes")],  # provides PHONEMES_TOKEN
+    secrets=[modal.Secret.from_name(SECRET_NAME)],  # provides PHONEMES_TOKEN
     scaledown_window=120,  # SLPs transcribe on demand; keep warm briefly between taps
     max_containers=1,
     timeout=600,
@@ -194,10 +214,10 @@ class Phonemes:
 
 
 # Small CPU-only front door: starts in about a second, so the Worker never waits for the GPU to boot.
-web_image = modal.Image.debian_slim(python_version="3.11").pip_install("fastapi[standard]")
+web_image = modal.Image.debian_slim(python_version="3.12").pip_install("fastapi[standard]").env({"NOTEBOOK_ENV": ENV})
 
 
-@app.function(image=web_image, secrets=[modal.Secret.from_name("tinig-notebook-phonemes")], scaledown_window=300)
+@app.function(image=web_image, secrets=[modal.Secret.from_name(SECRET_NAME)], scaledown_window=300)
 @modal.asgi_app()
 def api():
     import hmac
