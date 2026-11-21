@@ -41,7 +41,7 @@ export default async function AdminPage() {
         {pending.length === 0 && <p className="text-muted">No pending requests.</p>}
         <ul className="space-y-2">
           {pending.map((r) => (
-            <li key={r.email} className="flex flex-wrap items-center justify-between gap-3 rounded-[20px] bg-card p-4">
+            <li key={r.email} className="flex flex-wrap items-center justify-between gap-3 rounded-panel bg-card p-4 ring-1 ring-inset ring-border">
               <div className="min-w-0">
                 <p className="font-semibold">{r.name}</p>
                 <p className="truncate text-sm text-muted">
@@ -69,7 +69,7 @@ export default async function AdminPage() {
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Approved</h2>
-        <ul className="divide-y divide-border rounded-[20px] bg-card">
+        <ul className="divide-y divide-border rounded-panel bg-card ring-1 ring-inset ring-border">
           {allowed.map((a) => (
             <li key={a.email} className="flex items-center justify-between gap-3 px-4 py-3">
               <span className="min-w-0 truncate">

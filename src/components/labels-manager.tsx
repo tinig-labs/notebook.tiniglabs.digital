@@ -57,7 +57,7 @@ function LabelList({ scope }: { scope: "recording" | "error" }) {
           e.preventDefault();
           void add();
         }}
-        className="space-y-3 rounded-[28px] bg-card p-6 ring-1 ring-inset ring-border"
+        className="space-y-3 rounded-card bg-card p-6 ring-1 ring-inset ring-border"
       >
         <div className="flex gap-2">
           <Input
@@ -85,7 +85,7 @@ function LabelList({ scope }: { scope: "recording" | "error" }) {
           </div>
         </EmptyState>
       ) : (
-        <ul className="divide-y divide-border rounded-[28px] bg-card ring-1 ring-inset ring-border">
+        <ul className="divide-y divide-border rounded-card bg-card ring-1 ring-inset ring-border">
           {labels.map((l) =>
             edit?.id === l.id ? (
               <li key={l.id} className="space-y-3 p-4">
@@ -135,7 +135,7 @@ function Equivalences() {
   const [a, setA] = useState("");
   const [b, setB] = useState("");
   return (
-    <div className="space-y-3 rounded-[28px] bg-card p-6 ring-1 ring-inset ring-border">
+    <div className="space-y-3 rounded-card bg-card p-6 ring-1 ring-inset ring-border">
       <p className="text-sm text-muted">Counted as correct when comparing IPA.</p>
       <ul className="flex flex-wrap gap-2">
         {DEFAULT_EQUIVALENCES.map(([x, y]) => (

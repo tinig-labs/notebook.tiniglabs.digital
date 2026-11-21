@@ -6,16 +6,16 @@ import type { ErrorType } from "@/lib/ipa/compare";
 
 const STYLE: Record<ErrorType, { tile: string; badge: string }> = {
   C: { tile: "bg-card ring-1 ring-inset ring-border", badge: "" },
-  S: { tile: "bg-[#fbf1df] ring-1 ring-inset ring-[#b7791f]/40", badge: "bg-[#b7791f] text-white" },
-  O: { tile: "bg-[#fbeef1] outline-dashed outline-2 -outline-offset-2 outline-[#b4234a]/60", badge: "bg-[#b4234a] text-white" },
-  D: { tile: "bg-[#e3f0f7] ring-1 ring-inset ring-[#2a6f97]/40", badge: "bg-[#2a6f97] text-white" },
-  A: { tile: "bg-[#efeaf7] ring-1 ring-inset ring-[#6b4fa0]/40", badge: "bg-[#6b4fa0] text-white" },
+  S: { tile: "bg-[var(--soda-s-tint)] ring-1 ring-inset ring-[var(--soda-s)]/40", badge: "bg-[var(--soda-s)] text-white" },
+  O: { tile: "bg-[var(--soda-o-tint)] outline-dashed outline-2 -outline-offset-2 outline-[var(--soda-o)]/60", badge: "bg-[var(--soda-o)] text-white" },
+  D: { tile: "bg-[var(--soda-d-tint)] ring-1 ring-inset ring-[var(--soda-d)]/40", badge: "bg-[var(--soda-d)] text-white" },
+  A: { tile: "bg-[var(--soda-a-tint)] ring-1 ring-inset ring-[var(--soda-a)]/40", badge: "bg-[var(--soda-a)] text-white" },
 };
 
 /** A static copy of a review tile, for the guide. */
 function MiniTile({ t, p, type }: { t: string | null; p: string | null; type: ErrorType }) {
   return (
-    <span className={`relative inline-flex w-10 shrink-0 flex-col rounded-xl text-center ${STYLE[type].tile}`} aria-hidden="true">
+    <span className={`relative inline-flex w-10 shrink-0 flex-col rounded-tag text-center ${STYLE[type].tile}`} aria-hidden="true">
       <span className={`ipa block pt-1 text-base leading-6 ${t ? "text-text/70" : "text-transparent"}`}>{t ?? "·"}</span>
       <span className={`ipa block border-t border-dashed border-text/10 pb-1 text-base font-semibold leading-6 ${type === "C" ? "text-accent" : "text-text"}`}>
         {p ?? "–"}
@@ -56,12 +56,12 @@ export function ReviewGuide() {
   };
 
   return (
-    <div className="rounded-[20px] bg-card ring-1 ring-inset ring-border">
+    <div className="rounded-panel bg-card ring-1 ring-inset ring-border">
       <button
         type="button"
         onClick={toggle}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-2 rounded-[20px] px-4 py-3 text-left text-sm font-semibold"
+        className="flex w-full items-center justify-between gap-2 rounded-panel px-4 py-3 text-left text-sm font-semibold"
       >
         <span className="flex items-center gap-2">
           <Info size={16} className="text-accent" aria-hidden="true" /> How to read and edit
@@ -98,7 +98,7 @@ export function ReviewGuide() {
             <p className="text-muted">It starts as the model&apos;s draft. Make it match what you heard.</p>
             <ul className="space-y-3 text-muted">
               <li className="flex gap-3">
-                <span className="ipa flex size-8 shrink-0 items-center justify-center rounded-xl bg-surface text-base font-semibold text-accent" aria-hidden="true">
+                <span className="ipa flex size-8 shrink-0 items-center justify-center rounded-tag bg-surface text-base font-semibold text-accent" aria-hidden="true">
                   t
                 </span>
                 <span>
@@ -138,15 +138,15 @@ export function ReviewGuide() {
               Scores
             </h3>
             <dl className="grid gap-2 sm:grid-cols-3">
-              <div className="rounded-2xl bg-surface/60 p-3">
+              <div className="rounded-panel bg-surface/60 p-3">
                 <dt className="font-semibold">PCC</dt>
                 <dd className="text-muted">Consonants said correctly, out of all target consonants. Higher is better.</dd>
               </div>
-              <div className="rounded-2xl bg-surface/60 p-3">
+              <div className="rounded-panel bg-surface/60 p-3">
                 <dt className="font-semibold">PER</dt>
                 <dd className="text-muted">Substitutions, omissions and additions per target sound. Lower is better.</dd>
               </div>
-              <div className="rounded-2xl bg-surface/60 p-3">
+              <div className="rounded-panel bg-surface/60 p-3">
                 <dt className="font-semibold">FER</dt>
                 <dd className="text-muted">How far off the sounds were, by speech features, so near misses count less. Lower is better.</dd>
               </div>

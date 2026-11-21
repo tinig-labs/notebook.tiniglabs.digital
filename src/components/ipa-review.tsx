@@ -20,17 +20,17 @@ import type { Recording, Review, Target } from "@/lib/local/types";
 
 export const TYPE_INFO: Record<ErrorType, { label: string; tile: string; badge: string }> = {
   C: { label: "Correct", tile: "bg-card ring-border", badge: "" },
-  S: { label: "Substitution", tile: "bg-[#fbf1df] ring-[#b7791f]/40", badge: "bg-[#b7791f] text-white" },
-  O: { label: "Omission", tile: "bg-[#fbeef1] ring-0 outline-dashed outline-2 -outline-offset-2 outline-[#b4234a]/60", badge: "bg-[#b4234a] text-white" },
-  D: { label: "Distortion", tile: "bg-[#e3f0f7] ring-[#2a6f97]/40", badge: "bg-[#2a6f97] text-white" },
-  A: { label: "Addition", tile: "bg-[#efeaf7] ring-[#6b4fa0]/40", badge: "bg-[#6b4fa0] text-white" },
+  S: { label: "Substitution", tile: "bg-[var(--soda-s-tint)] ring-[var(--soda-s)]/40", badge: "bg-[var(--soda-s)] text-white" },
+  O: { label: "Omission", tile: "bg-[var(--soda-o-tint)] ring-0 outline-dashed outline-2 -outline-offset-2 outline-[var(--soda-o)]/60", badge: "bg-[var(--soda-o)] text-white" },
+  D: { label: "Distortion", tile: "bg-[var(--soda-d-tint)] ring-[var(--soda-d)]/40", badge: "bg-[var(--soda-d)] text-white" },
+  A: { label: "Addition", tile: "bg-[var(--soda-a-tint)] ring-[var(--soda-a)]/40", badge: "bg-[var(--soda-a)] text-white" },
 };
 
 const isProcess = (t: string): t is Process => t in PROCESSES;
 
 function Metric({ label, value, hint }: { label: string; value: string; hint: string }) {
   return (
-    <div className="min-w-0 rounded-2xl bg-card px-4 py-3" title={hint}>
+    <div className="min-w-0 rounded-panel bg-card px-4 py-3" title={hint}>
       <p className="text-xs font-semibold text-muted">{label}</p>
       <p className="text-xl font-semibold tabular-nums">{value}</p>
     </div>
@@ -47,7 +47,7 @@ function Tile({ op, selected, onSelect }: { op: ReviewedOp; selected: boolean; o
       onClick={onSelect}
       aria-pressed={selected}
       aria-label={label}
-      className={`relative flex min-w-9 flex-col items-stretch rounded-xl text-center ring-1 ring-inset transition-shadow ${info.tile} ${selected ? "shadow-[0_0_0_2px_var(--pandan)]" : ""}`}
+      className={`relative flex min-w-9 flex-col items-stretch rounded-tag text-center ring-1 ring-inset transition-shadow ${info.tile} ${selected ? "shadow-[0_0_0_2px_var(--pandan)]" : ""}`}
     >
       <span className={`ipa block px-1.5 pt-1 text-lg leading-7 ${op.t ? "text-text/70" : "text-transparent"}`}>{op.t?.text ?? "·"}</span>
       <span className={`ipa block border-t border-dashed border-text/10 px-1.5 pb-1 text-lg font-semibold leading-7 ${err ? "text-text" : "text-accent"}`}>
@@ -180,7 +180,7 @@ function MarkEditor({
   }
 
   return (
-    <div className="space-y-4 rounded-[20px] bg-card p-4 ring-1 ring-inset ring-border">
+    <div className="space-y-4 rounded-panel bg-card p-4 ring-1 ring-inset ring-border">
       <div className="flex items-center justify-between gap-2">
         <p className="ipa flex items-center gap-2 text-2xl">
           <span className="text-text/70">{op.t?.text ?? "∅"}</span>
@@ -282,7 +282,7 @@ function MarkEditor({
 function InsertEditor({ onAdd, onClose }: { onAdd: (text: string) => void; onClose: () => void }) {
   const [v, setV] = useState("");
   return (
-    <div className="space-y-3 rounded-[20px] bg-card p-4 ring-1 ring-inset ring-border">
+    <div className="space-y-3 rounded-panel bg-card p-4 ring-1 ring-inset ring-border">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-muted">Insert a sound the patient added</p>
         <button type="button" onClick={onClose} aria-label="Close" className="rounded-full p-2 text-muted hover:bg-surface">
@@ -302,7 +302,7 @@ function InsertEditor({ onAdd, onClose }: { onAdd: (text: string) => void; onClo
 function RowEditor({ initial, onSave, onClose, label = "Patient's IPA" }: { initial: string; onSave: (v: string) => void; onClose?: () => void; label?: string }) {
   const [v, setV] = useState(initial);
   return (
-    <div className="space-y-3 rounded-[20px] bg-card p-4 ring-1 ring-inset ring-border">
+    <div className="space-y-3 rounded-panel bg-card p-4 ring-1 ring-inset ring-border">
       <p className="text-sm font-medium text-muted">{label}</p>
       <IpaField value={v} onChange={setV} onSubmit={() => onSave(v)} label={label} autoFocus wide />
       <div className="flex gap-2">
@@ -413,7 +413,7 @@ export function IpaReview({ id, recording, modelIpa }: { id: string; recording: 
       </div>
 
       {libIpaChanged && (
-        <p className="flex flex-wrap items-center gap-2 rounded-2xl bg-card px-4 py-2 text-sm">
+        <p className="flex flex-wrap items-center gap-2 rounded-panel bg-card px-4 py-2 text-sm">
           The library IPA for this target changed.
           <button type="button" className="font-semibold text-accent" onClick={() => void update(() => ({ targetIpa: (libTarget!.value as Target).ipa }))}>
             Use current
@@ -421,7 +421,7 @@ export function IpaReview({ id, recording, modelIpa }: { id: string; recording: 
         </p>
       )}
       {newerModel && (
-        <p className="flex flex-wrap items-center gap-2 rounded-2xl bg-card px-4 py-2 text-sm">
+        <p className="flex flex-wrap items-center gap-2 rounded-panel bg-card px-4 py-2 text-sm">
           <Sparkles size={14} className="text-accent" aria-hidden="true" /> The model has a new transcription.
           <button type="button" className="font-semibold text-accent" onClick={() => void setIpa(modelIpa!)}>
             Use it
@@ -478,7 +478,7 @@ export function IpaReview({ id, recording, modelIpa }: { id: string; recording: 
               <button
                 type="button"
                 onClick={() => setPanel({ kind: "tile", key: o.key })}
-                className="flex w-full flex-wrap items-center gap-2 rounded-2xl px-2 py-1.5 text-left text-sm hover:bg-card"
+                className="flex w-full flex-wrap items-center gap-2 rounded-panel px-2 py-1.5 text-left text-sm hover:bg-card"
               >
                 <span className={`flex size-[18px] shrink-0 items-center justify-center rounded-full text-[0.625rem] font-bold ${TYPE_INFO[o.finalType].badge}`} aria-hidden="true">
                   {o.finalType}
@@ -511,7 +511,7 @@ export function IpaReview({ id, recording, modelIpa }: { id: string; recording: 
       )}
 
       {reviewed.detached.length > 0 && (
-        <div className="space-y-2 rounded-2xl bg-card p-4 text-sm">
+        <div className="space-y-2 rounded-panel bg-card p-4 text-sm">
           <p className="flex items-center gap-2 font-semibold">
             <Link2Off size={16} aria-hidden="true" /> Notes from an earlier version of the IPA
           </p>
