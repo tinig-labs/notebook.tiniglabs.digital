@@ -42,11 +42,13 @@ async function api(path: string, init: RequestInit = {}) {
   const headers = new Headers(init.headers);
   headers.set("x-device-id", await deviceId());
   const res = await fetch(path, { ...init, headers, credentials: "same-origin", cache: "no-store" });
-  if (res.status === 410) {
-    // Signed out from another device: remove everything here.
+  const taken = res.status === 409 && ((await res.clone().json().catch(() => null)) as { code?: string } | null)?.code === "DEVICE_TAKEN";
+  if (res.status === 410 || taken) {
+    // 410: signed out from another device. DEVICE_TAKEN: someone else signed in on this browser.
+    // Either way this copy must not stay open here.
     await wipeLocal();
-    location.replace("/sign-in?revoked=1");
-    throw new HttpError(410);
+    location.replace(taken ? "/sign-in" : "/sign-in?revoked=1");
+    throw new HttpError(res.status);
   }
   if (!res.ok) throw new HttpError(res.status);
   return res;
@@ -127,6 +129,7 @@ async function runJobs() {
       await markRows([j.id], { ipaStatus: "queued" });
     } catch (e) {
       if (e instanceof HttpError && e.status === 409) continue; // audio not on the server yet
+      if (e instanceof HttpError && e.status === 429) return; // rate limited: the rest wait for the next sync
       throw e;
     }
   }

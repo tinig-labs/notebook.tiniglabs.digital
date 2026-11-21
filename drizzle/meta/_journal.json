@@ -15,6 +15,13 @@
       "when": 1795116555516,
       "tag": "0001_target_kind",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795243061369,
+      "tag": "0002_device_session",
+      "breakpoints": true
     }
   ]
 }
