@@ -47,7 +47,7 @@ export default function TermsPage() {
 
       <Section id="ipa" title="Transcriptions">
         <P>
-          IPA is produced by a research model (used under a non-commercial licence). It can be wrong.
+          IPA is produced by a research model (POWSM-CTC, used under CC BY 4.0). It can be wrong.
           Treat it as a draft and use your clinical judgment.
         </P>
       </Section>

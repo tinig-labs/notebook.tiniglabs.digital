@@ -32,7 +32,7 @@
 
 This is the source for [notebook.tiniglabs.digital](https://notebook.tiniglabs.digital), a notebook where speech-language pathologists (SLPs) keep their patients' speech recordings. *Tinig* is Filipino for voice.
 
-An SLP records a patient saying a word or sentence from their own target list. A phoneme model drafts the IPA. The notebook lines it up against the ideal IPA sound by sound, marks each error as a substitution, omission, distortion or addition, and suggests the phonological process. The SLP corrects the patient's IPA in place, adds notes, and follows each target's percent consonants correct over time.
+An SLP records a patient saying a word or sentence from their own target list. A phoneme model ([POWSM-CTC](https://huggingface.co/espnet/powsm_ctc)) drafts the IPA. The notebook lines it up against the ideal IPA sound by sound, marks each error as a substitution, omission, distortion or addition, and suggests the phonological process. The SLP corrects the patient's IPA in place, adds notes, and follows each target's percent consonants correct over time.
 
 It's an installable app for Android, iPhone, iPad and computers. It works offline and syncs between devices. Patient data is encrypted on the device before it's stored or synced, without a passphrase to remember.
 
@@ -79,6 +79,6 @@ Every push to `main` deploys to production.
 
 The web app is under the [Functional Source License 1.1, Apache 2.0 Future License](LICENSE.md) (FSL-1.1-ALv2). You can use, copy and change it for anything except a competing commercial product. Each version becomes available under Apache 2.0 two years after it's published.
 
-The model service in `modal/` is under the [GNU Affero General Public License v3.0](modal/LICENSE). The panphon feature table and the epitran Tagalog rules are MIT-licensed. The phoneme model weights are their authors' work under CC BY-NC-SA 4.0; they aren't part of this repository and aren't covered by its licenses. Patients' recordings and notes belong to the SLPs and patients, never to this repository. [LICENSING.md](LICENSING.md) has the details.
+The model service in `modal/` is under the [GNU Affero General Public License v3.0](modal/LICENSE). The panphon feature table and the epitran Tagalog rules are MIT-licensed. The POWSM-CTC weights are their authors' work under CC BY 4.0; they aren't part of this repository and aren't covered by its licenses. Patients' recordings and notes belong to the SLPs and patients, never to this repository. [LICENSING.md](LICENSING.md) has the details.
 
 The tinig labs name and logo aren't covered by these licenses.
