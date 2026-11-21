@@ -50,7 +50,8 @@ Test a migration on staging before running it on production.
 
 ## Conventions
 
-- Colours only from the tokens in `src/app/globals.css`; components from `src/components/ui`.
+- Colours, radii and fonts only from the tokens in `src/app/globals.css` (see [BRAND.md](BRAND.md)); components from `src/components/ui`.
+- Logos only from `public/brand/` via `src/components/brand.tsx`: the Arch n for the notebook, the Echo t for tinig labs.
 - Figtree for text, Montserrat only for "tinig labs" (lowercase), Noto Sans for IPA (`.ipa`).
 - Short, sentence-case copy. Prefer an icon (lucide) next to a label over a sentence.
 - Layouts must work at 375 px; main navigation is the bottom tab bar on phones.

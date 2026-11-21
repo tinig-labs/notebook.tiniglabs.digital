@@ -69,8 +69,8 @@ const COLS = [
 /** The mint-framed summary table used on tiniglabs.digital/privacy. */
 export function DataTable({ rows, note }: { rows: Row[]; note: ReactNode }) {
   return (
-    <div className="rounded-[28px] bg-surface p-3">
-      <div className="rounded-[20px] bg-card px-6 py-2 sm:px-8">
+    <div className="rounded-card bg-surface p-3">
+      <div className="rounded-panel bg-card px-6 py-2 ring-1 ring-inset ring-border sm:px-8">
         <table className="w-full text-left">
           <caption className="sr-only">Data the notebook holds</caption>
           <thead className="hidden md:table-header-group">

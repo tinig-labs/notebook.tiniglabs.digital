@@ -2,7 +2,8 @@ import "server-only";
 import { CONTACT_EMAIL, SITE_URL } from "./constants";
 
 /**
- * Branded emails in the tinig labs design (same layout as collect.tiniglabs.digital).
+ * Branded emails in the tinig labs design (same layout as collect.tiniglabs.digital), headed by the
+ * notebook lockup: the Arch n (public/email-logo.png, from public/brand), "tinig labs", "notebook".
  * Table layout, inline styles and system fonts, because email clients ignore most CSS.
  */
 const C = { gatas: "#f9fbfa", tinta: "#13261f", abo: "#5f6f68", pandan: "#1f6b4f", mint: "#e2f3ea" };
@@ -18,8 +19,8 @@ function layout(subject: string, heading: string, blocks: Block[], preheader: st
     .map((b) => {
       if (b.kind === "p") return `<p style="margin:16px 0 0;font-size:16px;line-height:1.6;color:${C.abo}">${esc(b.text)}</p>`;
       if (b.kind === "code")
-        return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 0"><tr><td align="center" style="background:${C.mint};border-radius:20px;padding:24px 16px"><div style="font-family:${MONO};font-size:34px;line-height:1;font-weight:600;letter-spacing:0.18em;color:${C.pandan}">${esc(b.text)}</div></td></tr></table>`;
-      return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 0"><tr><td style="background:${C.pandan};border-radius:16px"><a href="${esc(b.href)}" style="display:inline-block;padding:16px 28px;font-size:16px;font-weight:600;color:#ffffff;text-decoration:none">${esc(b.text)}</a></td></tr></table>`;
+        return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 0"><tr><td align="center" style="background:${C.mint};border-radius:16px;padding:24px 16px"><div style="font-family:${MONO};font-size:34px;line-height:1;font-weight:600;letter-spacing:0.18em;color:${C.pandan}">${esc(b.text)}</div></td></tr></table>`;
+      return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 0"><tr><td style="background:${C.pandan};border-radius:9999px"><a href="${esc(b.href)}" style="display:inline-block;padding:16px 28px;font-size:16px;font-weight:600;color:#ffffff;text-decoration:none">${esc(b.text)}</a></td></tr></table>`;
     })
     .join("\n");
 
@@ -43,7 +44,7 @@ function layout(subject: string, heading: string, blocks: Block[], preheader: st
         <td style="vertical-align:middle;padding-left:8px;font-size:14px;font-weight:500;color:${C.abo}">notebook</td>
       </tr></table>
     </td></tr>
-    <tr><td style="background:#ffffff;border-radius:28px;padding:40px 32px">
+    <tr><td style="background:#ffffff;border-radius:24px;padding:40px 32px;border:1px solid #e3e7e5">
       <h1 style="margin:0;font-size:28px;line-height:1.15;font-weight:500;letter-spacing:-0.03em;color:${C.tinta}">${esc(heading)}</h1>
       ${body}
     </td></tr>

@@ -92,7 +92,7 @@ export function AudioPlayer({
   const progress = duration ? time / duration : 0;
 
   return (
-    <div className="flex w-full items-center gap-3 rounded-[20px] bg-surface p-2 pr-4">
+    <div className="flex w-full items-center gap-3 rounded-panel bg-surface p-2 pr-4">
       <audio
         ref={el}
         src={src}
@@ -143,7 +143,7 @@ export function AudioPlayer({
           else return;
           e.preventDefault();
         }}
-        className="flex h-10 min-w-0 flex-1 cursor-pointer items-center gap-[2px] rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        className="flex h-10 min-w-0 flex-1 cursor-pointer items-center gap-[2px] rounded-tag focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
       >
         {Array.from({ length: BARS }, (_, i) => {
           const h = peaks ? peaks[i] : 0.18;

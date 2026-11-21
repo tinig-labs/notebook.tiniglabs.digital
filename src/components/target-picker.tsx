@@ -84,7 +84,7 @@ export function TargetPicker({ value, onChange, disabled }: { value: PickedTarge
       </div>
 
       {open && (matches.length > 0 || (q && !exact)) && (
-        <ul id={listId} role="listbox" className="absolute inset-x-0 top-[3.25rem] z-20 max-h-72 overflow-auto rounded-[20px] bg-card p-1.5 shadow-lg ring-1 ring-border">
+        <ul id={listId} role="listbox" className="absolute inset-x-0 top-[3.25rem] z-20 max-h-72 overflow-auto rounded-panel bg-card p-1.5 shadow-lg ring-1 ring-border">
           {matches.map((t, i) => (
             <li
               key={t.id}
@@ -94,7 +94,7 @@ export function TargetPicker({ value, onChange, disabled }: { value: PickedTarge
                 e.preventDefault();
                 pick(t);
               }}
-              className={`flex cursor-pointer items-baseline justify-between gap-3 rounded-2xl px-3 py-2 ${i === active ? "bg-surface" : ""}`}
+              className={`flex cursor-pointer items-baseline justify-between gap-3 rounded-panel px-3 py-2 ${i === active ? "bg-surface" : ""}`}
             >
               <span className="truncate font-medium">{t.value.text}</span>
               <span className="ipa shrink-0 text-sm text-accent">{t.value.ipa[0]}</span>
@@ -109,7 +109,7 @@ export function TargetPicker({ value, onChange, disabled }: { value: PickedTarge
                 setAdding(true);
                 setOpen(false);
               }}
-              className="flex cursor-pointer items-center gap-2 rounded-2xl px-3 py-2 font-semibold text-accent hover:bg-surface"
+              className="flex cursor-pointer items-center gap-2 rounded-panel px-3 py-2 font-semibold text-accent hover:bg-surface"
             >
               <Plus size={16} aria-hidden="true" /> Add “{value.text.trim()}” to library
             </li>

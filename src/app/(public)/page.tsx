@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { AudioLines, Download, Mic, RefreshCw, ShieldCheck, Tags, WifiOff } from "lucide-react";
 import { RequestAccessForm } from "./request-access-form";
 import { HeroActions } from "@/components/session-links";
+import { NotebookMark } from "@/components/brand";
 import { SITE_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: { absolute: "Notebook · tinig labs" },
+  title: { absolute: "tinig labs notebook" },
   alternates: { canonical: SITE_URL },
 };
 
@@ -38,8 +39,8 @@ export default function Home() {
             <HeroActions />
           </div>
         </div>
-        <div className="rounded-[28px] bg-surface p-3" aria-hidden="true">
-          <div className="rounded-[20px] bg-card p-6 sm:p-8">
+        <div className="rounded-card bg-surface p-3" aria-hidden="true">
+          <div className="rounded-panel bg-card p-6 ring-1 ring-inset ring-border sm:p-8">
             <div className="flex items-center gap-3">
               <span className="flex size-11 items-center justify-center rounded-full bg-accent text-white">
                 <Mic size={20} />
@@ -58,6 +59,13 @@ export default function Home() {
               ))}
             </div>
           </div>
+          <div className="mt-3 flex items-center gap-4 rounded-panel bg-accent px-6 py-4 text-[var(--gatas)] sm:px-8">
+            <span className="text-sm font-semibold">PCC</span>
+            <span className="h-2 flex-1 overflow-hidden rounded-full bg-[var(--tinta)]/35">
+              <span className="block h-full w-[78%] rounded-full bg-dahon" />
+            </span>
+            <span className="text-sm font-semibold tabular-nums">78%</span>
+          </div>
         </div>
       </section>
 
@@ -67,7 +75,7 @@ export default function Home() {
         </h2>
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {FEATURES.map(({ icon: Icon, title, text }) => (
-            <li key={title} className="rounded-[28px] bg-surface p-6">
+            <li key={title} className="rounded-card bg-surface p-6 sm:p-8">
               <span className="flex size-11 items-center justify-center rounded-full bg-card text-accent">
                 <Icon size={20} aria-hidden="true" />
               </span>
@@ -78,15 +86,19 @@ export default function Home() {
         </ul>
       </section>
 
-      <section id="request" aria-labelledby="request-title" className="scroll-mt-6 rounded-[28px] bg-surface p-3 sm:p-4">
-        <div className="grid gap-8 rounded-[20px] bg-card p-6 sm:p-10 lg:grid-cols-[1fr_1.2fr]">
-          <div>
-            <h2 id="request-title" className="text-[1.75rem] font-medium leading-[1.2] tracking-[-0.02em] sm:text-[2.75rem]">
+      <section id="request" aria-labelledby="request-title" className="on-dark scroll-mt-6 rounded-card bg-accent p-3 sm:p-4">
+        <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:items-start">
+          <div className="px-3 pt-5 text-[var(--gatas)] sm:px-6 sm:pt-8 lg:pb-8">
+            <NotebookMark size={48} on="dark" />
+            <h2 id="request-title" className="mt-6 text-[1.75rem] font-medium leading-[1.2] tracking-[-0.02em] sm:text-[2.75rem]">
               Join the beta
             </h2>
-            <p className="mt-4 max-w-[36ch] text-lg leading-relaxed text-muted">For practising SLPs. We&apos;ll email you when your access is ready.</p>
+            <p className="mt-4 max-w-[36ch] text-lg leading-relaxed text-[var(--mint)]">For practising SLPs. We&apos;ll email you when your access is ready.</p>
+            <span className="mt-6 block h-1 w-12 rounded-full bg-dahon" aria-hidden="true" />
           </div>
-          <RequestAccessForm />
+          <div className="rounded-panel bg-card p-6 text-text sm:p-10 on-light">
+            <RequestAccessForm />
+          </div>
         </div>
       </section>
     </>

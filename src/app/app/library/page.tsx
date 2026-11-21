@@ -169,7 +169,7 @@ function Targets() {
       ) : (
         targets.length > 0 && (
           <>
-            <div className="overflow-hidden rounded-[28px] bg-card ring-1 ring-inset ring-border">
+            <div className="overflow-hidden rounded-card bg-card ring-1 ring-inset ring-border">
               <div className={`hidden px-5 py-3 text-xs font-semibold text-muted ${COLS}`} aria-hidden="true">
                 <span>Target</span>
                 <span>Ideal IPA</span>

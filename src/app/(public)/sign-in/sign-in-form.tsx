@@ -43,7 +43,7 @@ export function SignInForm() {
   return (
     <div className="space-y-4">
       {params.get("revoked") === "1" && (
-        <p role="status" className="rounded-2xl bg-surface px-4 py-3 text-sm">
+        <p role="status" className="rounded-panel bg-surface px-4 py-3 text-sm">
           This device was signed out and its local data removed.
         </p>
       )}
