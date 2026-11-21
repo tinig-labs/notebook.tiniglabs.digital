@@ -7,6 +7,7 @@ type Env = {
   REQUEST_LIMITER?: RateLimiter;
   OTP_LIMITER?: RateLimiter;
   UPLOAD_LIMITER?: RateLimiter;
+  TRANSCRIBE_LIMITER?: RateLimiter;
 };
 
 export const cf = () => getCloudflareContext() as unknown as { env: Env; ctx: ExecutionContext };
@@ -22,7 +23,7 @@ export function later(p: Promise<unknown>) {
 }
 
 /** True when allowed. A missing binding (local dev) allows; `strict` refuses instead. */
-export async function rateLimit(name: "REQUEST_LIMITER" | "OTP_LIMITER" | "UPLOAD_LIMITER", key: string, strict = false) {
+export async function rateLimit(name: "REQUEST_LIMITER" | "OTP_LIMITER" | "UPLOAD_LIMITER" | "TRANSCRIBE_LIMITER", key: string, strict = false) {
   let limiter: RateLimiter | undefined;
   try {
     limiter = cf().env[name];

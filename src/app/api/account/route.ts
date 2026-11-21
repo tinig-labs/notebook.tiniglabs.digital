@@ -1,6 +1,6 @@
 import { and, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
-import { apiUser } from "@/lib/session";
+import { deviceUser } from "@/lib/devices";
 import { audioBucket } from "@/lib/cf";
 import { audit } from "@/lib/audit";
 import { clientIp } from "@/lib/cf";
@@ -11,8 +11,9 @@ import { auth } from "@/lib/auth/server";
  * Without the key, any copy left in backups is unreadable. The audit entry keeps only the id.
  */
 export async function DELETE(r: Request) {
-  const { user, error } = await apiUser();
-  if (error) return error;
+  const g = await deviceUser(r);
+  if (g.error) return g.error;
+  const { user } = g;
   const { confirm } = (await r.json().catch(() => ({}))) as { confirm?: string };
   if (typeof confirm !== "string" || confirm.trim().toLowerCase() !== user.email.toLowerCase()) return Response.json({ error: "Type your email to confirm." }, { status: 400 });
 

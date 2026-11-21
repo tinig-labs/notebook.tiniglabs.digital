@@ -76,8 +76,10 @@ export const devices = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull().defaultNow(),
     revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    // Neon Auth session last seen on this device, so revoking the device also ends the session.
+    sessionId: text("session_id"),
   },
-  (t) => [uniqueIndex("devices_user_id_idx").on(t.userId, t.id)],
+  (t) => [uniqueIndex("devices_user_id_idx").on(t.userId, t.id), index("devices_user_session_idx").on(t.userId, t.sessionId)],
 );
 
 export const auditActions = [
