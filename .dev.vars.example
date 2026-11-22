@@ -11,8 +11,7 @@ NEON_AUTH_COOKIE_SECRET=generate-with-openssl-rand-base64-32
 # Never rotate by replacing: add NOTEBOOK_KEK_V2 and bump KEK_VERSION in src/lib/crypto/server.ts.
 NOTEBOOK_KEK=
 
-# Modal POWSM-CTC phoneme endpoint (modal/notebook_phonemes.py). In .dev.vars.staging, use the
-# tinig-notebook-phonemes-staging app's URL and the PHONEMES_TOKEN from its own Modal secret.
+# Modal POWSM-CTC phoneme endpoint (modal/notebook_phonemes.py) and the PHONEMES_TOKEN from its Modal secret.
 MODAL_ENDPOINT_URL=
 MODAL_TOKEN=
 CRON_SECRET=generate-a-long-random-string
