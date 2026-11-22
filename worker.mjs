@@ -5,11 +5,15 @@ import { default as handler } from "./.open-next/worker.js";
 const worker = {
   fetch: handler.fetch,
 
-  /** @param {ScheduledController} _event @param {{ CRON_SECRET: string }} env @param {ExecutionContext} ctx */
-  async scheduled(_event, env, ctx) {
+  /** @param {ScheduledController} event @param {{ CRON_SECRET: string }} env @param {ExecutionContext} ctx */
+  async scheduled(event, env, ctx) {
+    // The route skips Neon unless something is queued; once every 6 h it checks anyway, in case
+    // the queue marker in R2 was lost.
+    const at = new Date(event.scheduledTime);
+    const sweep = at.getUTCHours() % 6 === 0 && at.getUTCMinutes() < 5;
     const req = new Request("https://internal/api/cron/transcribe", {
       method: "POST",
-      headers: { authorization: `Bearer ${env.CRON_SECRET}` },
+      headers: { authorization: `Bearer ${env.CRON_SECRET}`, ...(sweep ? { "x-cron-sweep": "1" } : {}) },
     });
     ctx.waitUntil(handler.fetch(req, env, ctx));
   },

@@ -4,6 +4,8 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 type RateLimiter = { limit: (o: { key: string }) => Promise<{ success: boolean }> };
 type Env = {
   AUDIO: R2Bucket;
+  /** OpenNext's cache bucket; also holds the IPA queue marker (src/lib/ipa-queue.ts). */
+  NEXT_INC_CACHE_R2_BUCKET?: R2Bucket;
   REQUEST_LIMITER?: RateLimiter;
   OTP_LIMITER?: RateLimiter;
   UPLOAD_LIMITER?: RateLimiter;
@@ -12,6 +14,14 @@ type Env = {
 
 export const cf = () => getCloudflareContext() as unknown as { env: Env; ctx: ExecutionContext };
 export const audioBucket = () => cf().env.AUDIO;
+/** Undefined in `next dev` without bindings: callers then fall back to checking Neon. */
+export function queueBucket() {
+  try {
+    return cf().env.NEXT_INC_CACHE_R2_BUCKET;
+  } catch {
+    return undefined;
+  }
+}
 
 /** Run after the response is sent (Workers waitUntil); falls back to fire-and-forget in dev. */
 export function later(p: Promise<unknown>) {

@@ -1,7 +1,8 @@
 import { and, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { deviceUser } from "@/lib/devices";
-import { later, rateLimit } from "@/lib/cf";
+import { later, queueBucket, rateLimit } from "@/lib/cf";
+import { markQueued } from "@/lib/ipa-queue";
 import { CLAIM_STALE, startTranscription } from "@/lib/transcribe";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -32,6 +33,8 @@ export async function POST(r: Request, c: Ctx) {
     if (busy) return Response.json({ ok: true, status: "queued" }, { status: 202 });
     return Response.json({ error: "Upload the audio first." }, { status: 409 });
   }
+  // After the commit above, so the cron can't miss it (src/lib/ipa-queue.ts).
+  await markQueued(queueBucket());
   later(startTranscription(id, user.id));
   return Response.json({ ok: true, status: "queued" }, { status: 202 });
 }
