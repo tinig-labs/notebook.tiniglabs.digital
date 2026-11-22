@@ -23,15 +23,11 @@ Contract (must match src/lib/modal.ts and src/app/api/ipa-callback):
       "segments": [{ "start": 0.0, "end": 3.2, "ipa": "..." }] }   or   { "job_id", "error" }
  Why: a Worker's background work is cut off after 30 s, and a cold GPU start takes longer.
 
-Environments: NOTEBOOK_ENV picks production (default) or staging. Each has its own app, secret
-and callback, so staging can never post results into production:
-    production  app tinig-notebook-phonemes          -> https://notebook.tiniglabs.digital
-    staging     app tinig-notebook-phonemes-staging  -> https://staging.notebook.tiniglabs.digital
+App tinig-notebook-phonemes, posting results to https://notebook.tiniglabs.digital.
 
 Setup:    modal secret create tinig-notebook-phonemes PHONEMES_TOKEN=<long random string>
-          modal secret create tinig-notebook-phonemes-staging PHONEMES_TOKEN=<another one>
-Deploy:   merging to main deploys production (.github/workflows/deploy-modal.yml), or by hand:
-          npm run deploy:modal / npm run deploy:modal:staging
+Deploy:   merging to main deploys it (.github/workflows/deploy-modal.yml), or by hand:
+          npm run deploy:modal
 Try one:  modal run modal/notebook_phonemes.py --wav path/to/clip.wav
 """
 
@@ -41,17 +37,9 @@ import re
 
 import modal
 
-# Read at deploy time and baked into both images below, because Modal re-imports this file
-# inside each container, where the deploy shell's environment isn't present.
-ENV = os.environ.get("NOTEBOOK_ENV", "production")
-ENVIRONMENTS = {
-    "production": ("tinig-notebook-phonemes", "https://notebook.tiniglabs.digital"),
-    "staging": ("tinig-notebook-phonemes-staging", "https://staging.notebook.tiniglabs.digital"),
-}
-if ENV not in ENVIRONMENTS:
-    raise ValueError(f"NOTEBOOK_ENV must be one of {sorted(ENVIRONMENTS)}, not {ENV!r}")
-APP_NAME, ORIGIN = ENVIRONMENTS[ENV]
-SECRET_NAME = APP_NAME  # holds PHONEMES_TOKEN, shared with that environment's Worker as MODAL_TOKEN
+APP_NAME = "tinig-notebook-phonemes"
+ORIGIN = "https://notebook.tiniglabs.digital"
+SECRET_NAME = APP_NAME  # holds PHONEMES_TOKEN, shared with the Worker as MODAL_TOKEN
 
 MODEL_ID = "espnet/powsm_ctc"
 # Pinned: the checkpoint is a pickled .pth, so never load an upload we haven't looked at.
@@ -95,7 +83,7 @@ image = (
         "fastapi[standard]",
         "httpx",
     )
-    .env({"HF_HOME": "/models/hf", "NOTEBOOK_ENV": ENV})
+    .env({"HF_HOME": "/models/hf"})
     .run_function(download_model)
     .env({"HF_HUB_OFFLINE": "1"})
 )
@@ -214,7 +202,7 @@ class Phonemes:
 
 
 # Small CPU-only front door: starts in about a second, so the Worker never waits for the GPU to boot.
-web_image = modal.Image.debian_slim(python_version="3.12").pip_install("fastapi[standard]").env({"NOTEBOOK_ENV": ENV})
+web_image = modal.Image.debian_slim(python_version="3.12").pip_install("fastapi[standard]")
 
 
 @app.function(image=web_image, secrets=[modal.Secret.from_name(SECRET_NAME)], scaledown_window=300)

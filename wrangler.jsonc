@@ -28,35 +28,6 @@
     "ACS_ENDPOINT": "https://tiniglabs-cs.asiapacific.communication.azure.com",
     "ALERT_FROM": "no-reply@tiniglabs.digital",
     "CONTACT_ALERT_TO": "hello@tiniglabs.digital"
-  },
-
-  // Staging: `npm run deploy:staging`. Own Worker, R2 buckets, rate limits and secrets
-  // (`node scripts/push-secrets.mjs --env staging`, from .dev.vars.staging); a schema-only Neon
-  // branch, so no production data. Bindings aren't inherited, so they are all repeated here.
-  "env": {
-    "staging": {
-      "name": "tinig-notebook-staging",
-      "routes": [{ "pattern": "staging.notebook.tiniglabs.digital", "custom_domain": true }],
-      "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "tinig-notebook-staging" }],
-      "r2_buckets": [
-        { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "tinig-notebook-staging-cache" },
-        { "binding": "AUDIO", "bucket_name": "tinig-notebook-staging-audio" }
-      ],
-      // No cron on staging, so its Neon branch sleeps between tests. A failed transcription there
-      // isn't retried automatically: tap Transcribe again.
-      "triggers": { "crons": [] },
-      "ratelimits": [
-        { "name": "REQUEST_LIMITER", "namespace_id": "3001", "simple": { "limit": 5, "period": 60 } },
-        { "name": "OTP_LIMITER", "namespace_id": "3002", "simple": { "limit": 5, "period": 60 } },
-        { "name": "UPLOAD_LIMITER", "namespace_id": "3003", "simple": { "limit": 60, "period": 60 } },
-        { "name": "TRANSCRIBE_LIMITER", "namespace_id": "3004", "simple": { "limit": 20, "period": 60 } }
-      ],
-      "vars": {
-        "ACS_ENDPOINT": "https://tiniglabs-cs.asiapacific.communication.azure.com",
-        "ALERT_FROM": "no-reply@tiniglabs.digital",
-        "CONTACT_ALERT_TO": "hello@tiniglabs.digital"
-      }
-    }
   }
   // Secrets (node scripts/push-secrets.mjs, from .dev.vars): DATABASE_URL, NEON_AUTH_BASE_URL,
   // NEON_AUTH_COOKIE_SECRET, NOTEBOOK_KEK, MODAL_ENDPOINT_URL, MODAL_TOKEN, CRON_SECRET, ADMIN_EMAILS,

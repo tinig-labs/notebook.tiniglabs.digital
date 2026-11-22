@@ -1,18 +1,12 @@
 name: Deploy Modal
 
-# The phoneme service in modal/. Production deploys when a merge to main touches modal/;
-# run it by hand to deploy any branch to staging (or to redeploy production).
+# The phoneme service in modal/. Deploys when a merge to main touches modal/; run it by hand
+# from main to redeploy.
 on:
   push:
     branches: [main]
     paths: [modal/**]
   workflow_dispatch:
-    inputs:
-      environment:
-        description: Which Modal app to deploy
-        type: choice
-        options: [staging, production]
-        default: staging
 
 permissions:
   contents: read
@@ -21,19 +15,18 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment:
-      name: ${{ inputs.environment || 'production' }}
+      name: production
     concurrency:
-      group: modal-${{ inputs.environment || 'production' }}
+      group: modal-production
       cancel-in-progress: false
     env:
-      NOTEBOOK_ENV: ${{ inputs.environment || 'production' }}
       MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
       MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
     steps:
-      - name: Only production may deploy from main
-        if: ${{ github.ref != 'refs/heads/main' && env.NOTEBOOK_ENV == 'production' }}
+      - name: Only deploy from main
+        if: ${{ github.ref != 'refs/heads/main' }}
         run: |
-          echo "Production deploys only from main; pick staging for other branches."
+          echo "Modal deploys only from main."
           exit 1
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

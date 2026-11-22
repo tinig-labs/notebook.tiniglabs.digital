@@ -34,26 +34,6 @@ store a copy in the password manager / offline, never in the repo.
 
 Migrations are not run by CI: run `npm run db:migrate` before the deploy that needs them.
 
-## Staging
-
-`https://staging.notebook.tiniglabs.digital`: Worker `tinig-notebook-staging` (`env.staging` in
-`wrangler.jsonc`), R2 buckets `tinig-notebook-staging-audio` / `-cache`, and a **schema-only**
-Neon branch `staging`, so it never holds production patients or users. It has its own Neon Auth,
-KEK and cookie secret, and its own Modal app `tinig-notebook-phonemes-staging`, whose results go back
-to staging only. Deploy a branch's `modal/` there before merging: run the **Deploy Modal** workflow on
-that branch with environment `staging`, or `npm run deploy:modal:staging`. One-time setup:
-`modal secret create tinig-notebook-phonemes-staging PHONEMES_TOKEN=<random>`, then put the staging
-app's URL and that token in `.dev.vars.staging` as `MODAL_ENDPOINT_URL` / `MODAL_TOKEN`.
-
-```bash
-# .dev.vars.staging: the staging branch's URLs and staging-only secrets (gitignored)
-DATABASE_URL_UNPOOLED=<staging direct url> npm run db:migrate   # before a deploy that needs it
-node scripts/push-secrets.mjs --env staging                    # ACS / Turnstile fall back to .dev.vars
-npm run deploy:staging
-```
-
-Test a migration on staging before running it on production.
-
 ## Conventions
 
 - Colours, radii and fonts only from the tokens in `src/app/globals.css` (see [BRAND.md](BRAND.md)); components from `src/components/ui`.
