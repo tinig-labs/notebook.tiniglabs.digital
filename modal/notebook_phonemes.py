@@ -115,12 +115,18 @@ def split_on_pauses(mono, sr: int) -> list[tuple[int, int]]:
 @app.cls(
     gpu="T4",
     secrets=[modal.Secret.from_name(SECRET_NAME)],  # provides PHONEMES_TOKEN
-    scaledown_window=120,  # SLPs transcribe on demand; keep warm briefly between taps
+    # Billed while idle, so keep it short: a container that does scale down comes back from the
+    # memory snapshot below in a few seconds, faster than the old full cold start (3-33 s).
+    scaledown_window=45,
     max_containers=1,
     timeout=600,
+    # Snapshot the container after load(), GPU memory included, and restore from it on cold starts
+    # instead of re-importing torch/espnet and re-loading the model onto the GPU.
+    enable_memory_snapshot=True,
+    experimental_options={"enable_gpu_snapshot": True},
 )
 class Phonemes:
-    @modal.enter()
+    @modal.enter(snap=True)
     def load(self) -> None:
         import os
         from pathlib import Path
@@ -142,6 +148,13 @@ class Phonemes:
         )
         self.window = SAMPLE_RATE * int(WINDOW_S)
         self.version = f"{MODEL_ID}@{MODEL_REVISION[:12]}"
+        self.snap_dir = str(snap)
+
+    @modal.enter(snap=False)
+    def after_restore(self) -> None:
+        import os
+
+        os.chdir(self.snap_dir)  # in case the working directory isn't part of the restored state
 
     def _transcribe(self, data: bytes) -> dict:
         import io
@@ -205,7 +218,7 @@ class Phonemes:
 web_image = modal.Image.debian_slim(python_version="3.12").pip_install("fastapi[standard]")
 
 
-@app.function(image=web_image, secrets=[modal.Secret.from_name(SECRET_NAME)], scaledown_window=300)
+@app.function(image=web_image, secrets=[modal.Secret.from_name(SECRET_NAME)], scaledown_window=60)
 @modal.asgi_app()
 def api():
     import hmac

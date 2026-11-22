@@ -2,13 +2,16 @@
 import { useSyncExternalStore } from "react";
 import { getMeta, ldb, setMeta, wipeLocal } from "./db";
 import { deviceId } from "./keys";
+import { nextPollDelay } from "./poll";
 import { applyRemote, markRows, setChangeHandler } from "./store";
 import type { LocalRow } from "./types";
 
 /**
  * Offline-first sync. Order per run: push dirty records, upload pending audio, run queued
  * transcription requests, then pull everything newer than the last server rev.
- * Triggers: launch, edits (debounced), coming online, tab focus, and every 60 s.
+ * Triggers: launch, edits (debounced), coming online, tab focus, and a background poll that
+ * runs every 20 s while IPA is pending, every 60 s while the app is in use, and not at all once
+ * it sits unused (./poll.ts).
  */
 
 export type SyncState = "idle" | "syncing" | "offline" | "error" | "signed-out";
@@ -181,6 +184,7 @@ export function syncNow(): Promise<void> {
     } while (again);
   })().finally(() => {
     running = null;
+    afterSync();
   });
   return running;
 }
@@ -210,9 +214,57 @@ export function startSync() {
   };
   addEventListener("online", () => void syncNow());
   addEventListener("offline", () => set({ state: "offline" }));
-  document.addEventListener("visibilitychange", soft);
-  setInterval(soft, 60_000);
+  document.addEventListener("visibilitychange", () => {
+    soft();
+    void schedulePoll();
+  });
+
+  // Background polling: fast while IPA is pending, normal while someone is using the app, none
+  // once the tab sits unused (src/lib/local/poll.ts).
+  let lastInputAt = Date.now();
+  let poll: ReturnType<typeof setTimeout> | undefined;
+  let pollAt = 0;
+  const schedulePoll = async () => {
+    const pending = (await ldb().jobs.count()) > 0 || (await hasQueuedIpa());
+    const delay = nextPollDelay({ pending, lastInputAt, now: Date.now() });
+    if (delay === null) {
+      clearTimeout(poll);
+      pollAt = 0;
+      return;
+    }
+    // Keep an earlier timer that is already set; replace a later one.
+    if (pollAt && pollAt <= Date.now() + delay) return;
+    clearTimeout(poll);
+    pollAt = Date.now() + delay;
+    poll = setTimeout(() => {
+      pollAt = 0;
+      soft();
+      void schedulePoll();
+    }, delay);
+  };
+  const onInput = () => {
+    const wasIdle = pollAt === 0;
+    lastInputAt = Date.now();
+    if (wasIdle) {
+      soft(); // back after a quiet spell: catch up now
+      void schedulePoll();
+    }
+  };
+  for (const ev of ["pointerdown", "keydown", "touchstart", "wheel"]) addEventListener(ev, onInput, { passive: true });
+  afterSync = () => void schedulePoll();
   void syncNow();
+}
+
+/** Re-arms background polling after each run (set by startSync). */
+let afterSync: () => void = () => {};
+
+async function hasQueuedIpa() {
+  const n = await ldb()
+    .records.where("kind")
+    .equals("recording")
+    .filter((r) => !r.deleted && r.ipaStatus === "queued")
+    .count();
+  return n > 0;
 }
 
 export { api };
