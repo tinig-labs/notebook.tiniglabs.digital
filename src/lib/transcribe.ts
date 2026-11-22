@@ -1,7 +1,8 @@
 import "server-only";
 import { and, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
-import { audioBucket } from "@/lib/cf";
+import { audioBucket, queueBucket } from "@/lib/cf";
+import { markQueued } from "@/lib/ipa-queue";
 import { userDek } from "@/lib/crypto/server";
 import { aadAudio, aadRecord, open, sealJson } from "@/lib/crypto/aead";
 import { submitJob, type IpaResult } from "@/lib/modal";
@@ -19,10 +20,12 @@ const t = schema.records;
 
 async function fail(id: string, attempts: number, msg: string) {
   console.error("transcription failed", id, msg);
+  const retry = attempts < IPA_MAX_ATTEMPTS;
   await db()
     .update(t)
-    .set({ ipaStatus: attempts >= IPA_MAX_ATTEMPTS ? "failed" : "queued", ipaError: msg.slice(0, 300), ipaClaimedAt: null, rev: nextRev })
+    .set({ ipaStatus: retry ? "queued" : "failed", ipaError: msg.slice(0, 300), ipaClaimedAt: null, rev: nextRev })
     .where(eq(t.id, id));
+  if (retry) await markQueued(queueBucket());
 }
 
 /**
